@@ -1,6 +1,6 @@
 use futures_util::{SinkExt, StreamExt};
 use serde_json::Value;
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -24,7 +24,8 @@ pub struct TrackInfo {
 
 pub struct Meta {
     station: Cell<Station>,
-    running: Arc<AtomicBool>,
+    running: Cell<bool>,
+    stop_flag: RefCell<Option<Arc<AtomicBool>>>,
     sender: Sender<TrackInfo>,
 }
 
@@ -33,13 +34,14 @@ impl Meta {
     pub fn new(station: Station, sender: Sender<TrackInfo>) -> Rc<Self> {
         Rc::new(Self {
             station: Cell::new(station),
-            running: Arc::new(AtomicBool::new(false)),
+            running: Cell::new(false),
+            stop_flag: RefCell::new(None),
             sender,
         })
     }
 
     pub fn set_station(self: &Rc<Self>, station: Station) {
-        let was_running = self.running.load(Ordering::SeqCst);
+        let was_running = self.running.get();
         if was_running {
             self.stop();
         }
@@ -49,32 +51,34 @@ impl Meta {
         }
     }
 
-    /// Start the background websocket/metadata loop.
     pub fn start(self: &Rc<Self>) {
-        if self
-            .running
-            .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
-            .is_err()
-        {
-            // already running
+        if self.running.get() {
             return;
         }
+        self.running.set(true);
 
-        let running = self.running.clone();
-        let sender = self.sender.clone();
         let station = self.station.get();
+        let sender = self.sender.clone();
+
+        let stop = Arc::new(AtomicBool::new(false));
+        *self.stop_flag.borrow_mut() = Some(stop.clone());
 
         thread::spawn(move || {
             let rt = Runtime::new().expect("Failed to create Tokio runtime for Meta");
 
-            if let Err(err) = rt.block_on(run_meta_loop(station, sender, running.clone())) {
+            if let Err(err) = rt.block_on(run_meta_loop(station, sender, stop)) {
                 eprintln!("Gateway error in metadata loop: {err}");
             }
         });
     }
 
     pub fn stop(&self) {
-        self.running.store(false, Ordering::SeqCst);
+        self.running.set(false); // Mark as not running
+
+        // Signal the background meta loop to stop
+        if let Some(stop) = self.stop_flag.borrow_mut().take() {
+            stop.store(true, Ordering::SeqCst);
+        }
     }
 }
 
@@ -82,18 +86,18 @@ impl Meta {
 async fn run_meta_loop(
     station: Station,
     sender: Sender<TrackInfo>,
-    running: Arc<AtomicBool>,
+    stop: Arc<AtomicBool>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    while running.load(Ordering::SeqCst) {
-        match run_once(station.clone(), sender.clone(), running.clone()).await {
+    while !stop.load(Ordering::SeqCst) {
+        match run_once(station.clone(), sender.clone(), stop.clone()).await {
             Ok(()) => {
-                if !running.load(Ordering::SeqCst) {
+                if stop.load(Ordering::SeqCst) {
                     break;
                 }
                 tokio::time::sleep(Duration::from_secs(5)).await;
             }
             Err(err) => {
-                if !running.load(Ordering::SeqCst) {
+                if stop.load(Ordering::SeqCst) {
                     break;
                 }
                 eprintln!("Gateway connection error: {err}, retrying in 5s…");
@@ -109,9 +113,9 @@ async fn run_meta_loop(
 async fn run_once(
     station: Station,
     sender: Sender<TrackInfo>,
-    running: Arc<AtomicBool>,
+    stop: Arc<AtomicBool>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    if !running.load(Ordering::SeqCst) {
+    if stop.load(Ordering::SeqCst) {
         return Ok(());
     }
 
@@ -139,17 +143,17 @@ async fn run_once(
 
     // Spawn heartbeat sender if there is an interval
     if let Some(ms) = heartbeat_ms {
-        let running_for_hb = running.clone();
+        let stop_for_hb = stop.clone();
         tokio::spawn(async move {
             let interval = Duration::from_millis(ms);
             loop {
-                if !running_for_hb.load(Ordering::SeqCst) {
+                if stop_for_hb.load(Ordering::SeqCst) {
                     break;
                 }
 
                 tokio::time::sleep(interval).await;
 
-                if !running_for_hb.load(Ordering::SeqCst) {
+                if stop_for_hb.load(Ordering::SeqCst) {
                     break;
                 }
 
@@ -162,7 +166,7 @@ async fn run_once(
     }
 
     // 2. Process messages, look for TRACK_UPDATE
-    while running.load(Ordering::SeqCst) {
+    while !stop.load(Ordering::SeqCst) {
         let Some(msg) = read.next().await else {
             break;
         };
