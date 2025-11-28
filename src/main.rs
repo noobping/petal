@@ -125,11 +125,11 @@ fn build_ui(app: &Application) {
     window.add_action(&play_action);
     window.add_action(&stop_action);
 
-    let toggle_action = gio::SimpleAction::new("play_or_stop", None);
     {
         let play = play_button.clone();
         let stop = stop_button.clone();
         let win_clone = window.clone();
+        let toggle_action = gio::SimpleAction::new("toggle", None);
         toggle_action.connect_activate(move |_, _| {
             if play.is_visible() {
                 let _ = adw::prelude::WidgetExt::activate_action(
@@ -145,8 +145,8 @@ fn build_ui(app: &Application) {
                 );
             }
         });
+        window.add_action(&toggle_action);
     }
-    window.add_action(&toggle_action);
 
     #[cfg(feature = "setup")]
     app.set_accels_for_action("win.setup", &["F1"]);
@@ -154,7 +154,7 @@ fn build_ui(app: &Application) {
     app.set_accels_for_action("win.stop", &["XF86AudioStop", "XF86AudioPause"]);
     app.set_accels_for_action("win.jpop", &["XF86AudioPrev"]);
     app.set_accels_for_action("win.kpop", &["XF86AudioNext"]);
-    app.set_accels_for_action("win.play_or_stop", &["space", "Return"]);
+    app.set_accels_for_action("win.toggle", &["space", "Return"]);
 
     // Poll the channel on the GTK main thread and update WindowTitle
     {
