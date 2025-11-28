@@ -1,6 +1,6 @@
 use reqwest::blocking::{Client, Response};
 use rodio::{buffer::SamplesBuffer, OutputStreamBuilder, Sink};
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::error::Error;
 use std::io::{self, Read, Seek, SeekFrom};
 use std::rc::Rc;
@@ -9,6 +9,7 @@ use std::sync::{
     Arc,
 };
 use std::thread;
+use std::thread::JoinHandle;
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::codecs::{DecoderOptions, CODEC_TYPE_NULL};
 use symphonia::core::errors::Error as SymphoniaError;
@@ -53,6 +54,7 @@ impl MediaSource for HttpSource {
 pub struct Listen {
     station: Cell<Station>,
     running: Arc<AtomicBool>,
+    handle: RefCell<Option<JoinHandle<()>>>,
 }
 
 impl Listen {
@@ -60,6 +62,7 @@ impl Listen {
         Rc::new(Self {
             station: Cell::new(station),
             running: Arc::new(AtomicBool::new(false)),
+            handle: RefCell::new(None),
         })
     }
 
@@ -85,15 +88,20 @@ impl Listen {
 
         let running = self.running.clone();
         let station = self.station.get();
-        thread::spawn(move || {
+        let handle = thread::spawn(move || {
             if let Err(err) = run_listenmoe_stream(station, running.clone()) {
                 eprintln!("listen.moe stream exited with error: {err}");
             }
         });
+        *self.handle.borrow_mut() = Some(handle);
     }
 
     pub fn stop(&self) {
-        self.running.store(false, Ordering::SeqCst);
+        self.running.store(false, Ordering::SeqCst); // Signal the thread to stop
+        // Wait for the playback thread to exit
+        if let Some(handle) = self.handle.borrow_mut().take() {
+            let _ = handle.join();
+        }
     }
 }
 
