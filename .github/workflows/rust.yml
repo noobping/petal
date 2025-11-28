@@ -15,5 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get install libglib2.0-dev
       - run: cargo build --verbose
       - run: tree
