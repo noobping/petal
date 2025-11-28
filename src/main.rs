@@ -235,9 +235,9 @@ fn build_ui(app: &Application) {
     app.set_accels_for_action("win.copy", &["<primary>c"]);
     app.set_accels_for_action("win.play", &["XF86AudioPlay"]);
     app.set_accels_for_action("win.stop", &["XF86AudioStop", "XF86AudioPause"]);
-    app.set_accels_for_action("win.jpop", &["XF86AudioPrev", "<primary>j", "<primary>z"]);
-    app.set_accels_for_action("win.kpop", &["XF86AudioNext", "<primary>k", "<primary><shift>z", "<primary>y"]);
-    app.set_accels_for_action("win.toggle", &["space", "Return", "<primary>p", "<primary>s"]);
+    app.set_accels_for_action("win.jpop", &["<primary>j", "XF86AudioPrev", "<primary>z"]);
+    app.set_accels_for_action("win.kpop", &["<primary>k", "XF86AudioNext", "<primary><shift>z", "<primary>y"]);
+    app.set_accels_for_action("win.toggle", &["<primary>p", "space", "Return", "<primary>s"]);
 
     // Poll the channel on the GTK main thread and update WindowTitle
     {
