@@ -18,7 +18,7 @@ use adw::gio::SimpleAction;
 use adw::glib;
 use adw::prelude::*;
 use adw::{Application, WindowTitle};
-use gtk::{gio, ApplicationWindow, Box, Button, HeaderBar, MenuButton, Orientation};
+use gtk::{gdk::Display, gio, ApplicationWindow, Box, Button, HeaderBar, MenuButton, Orientation};
 use std::sync::mpsc;
 use std::sync::mpsc::TryRecvError;
 use std::time::Duration;
@@ -168,8 +168,38 @@ fn build_ui(app: &Application) {
         window.add_action(&action);
     }
 
+    {
+        let win = win_title.clone();
+        let action = gio::SimpleAction::new("copy", None);
+        action.connect_activate(move |_, _| {
+            // Get artist and title from the WindowTitle
+            let artist = win.title(); // artist
+            let title = win.subtitle(); // song title
+
+            // If nothing is playing yet, do nothing
+            if artist.is_empty() && title.is_empty() {
+                return;
+            }
+
+            let text = if artist.is_empty() {
+                title.to_string()
+            } else if title.is_empty() {
+                artist.to_string()
+            } else {
+                format!("{artist}, {title}")
+            };
+
+            if let Some(display) = Display::default() {
+                let clipboard = display.clipboard();
+                clipboard.set_text(&text);
+            }
+        });
+        window.add_action(&action);
+    }
+
     #[cfg(feature = "setup")]
     app.set_accels_for_action("win.setup", &["F1"]);
+    app.set_accels_for_action("win.copy", &["<primary>c"]);
     app.set_accels_for_action("win.play", &["XF86AudioPlay"]);
     app.set_accels_for_action("win.stop", &["XF86AudioStop", "XF86AudioPause"]);
     app.set_accels_for_action("win.jpop", &["XF86AudioPrev", "<primary>j", "<primary>z"]);
