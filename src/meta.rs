@@ -1,4 +1,4 @@
-use futures_util::StreamExt;
+use futures_util::{SinkExt, StreamExt};
 use serde_json::Value;
 use std::rc::Rc;
 use std::sync::{
@@ -10,6 +10,9 @@ use std::thread;
 use std::time::Duration;
 use tokio::runtime::Runtime;
 use tokio_tungstenite::connect_async;
+use tokio_tungstenite::tungstenite::Message;
+
+use crate::station::Station;
 
 /// Track info sent to the UI thread.
 #[derive(Debug, Clone)]
@@ -19,14 +22,16 @@ pub struct TrackInfo {
 }
 
 pub struct Meta {
+    station: Station,
     sender: Sender<TrackInfo>,
     running: Arc<AtomicBool>,
 }
 
 impl Meta {
     /// Create a new Meta, using the given channel to send track updates.
-    pub fn new(sender: Sender<TrackInfo>) -> Rc<Self> {
+    pub fn new(station: Station, sender: Sender<TrackInfo>) -> Rc<Self> {
         Rc::new(Self {
+            station,
             sender,
             running: Arc::new(AtomicBool::new(false)),
         })
@@ -45,11 +50,12 @@ impl Meta {
 
         let running = self.running.clone();
         let sender = self.sender.clone();
+        let station = self.station;
 
         thread::spawn(move || {
             let rt = Runtime::new().expect("Failed to create Tokio runtime for Meta");
 
-            if let Err(err) = rt.block_on(run_meta_loop(sender, running.clone())) {
+            if let Err(err) = rt.block_on(run_meta_loop(station, sender, running.clone())) {
                 eprintln!("[meta] Fatal error in metadata loop: {err}");
             }
         });
@@ -62,11 +68,12 @@ impl Meta {
 
 /// Outer loop: reconnect if needed.
 async fn run_meta_loop(
+    station: Station,
     sender: Sender<TrackInfo>,
     running: Arc<AtomicBool>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     while running.load(Ordering::SeqCst) {
-        match run_once(sender.clone(), running.clone()).await {
+        match run_once(station.clone(), sender.clone(), running.clone()).await {
             Ok(()) => {
                 if !running.load(Ordering::SeqCst) {
                     break;
@@ -88,6 +95,7 @@ async fn run_meta_loop(
 
 /// Single websocket session.
 async fn run_once(
+    station: Station,
     sender: Sender<TrackInfo>,
     running: Arc<AtomicBool>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -95,17 +103,50 @@ async fn run_once(
         return Ok(());
     }
 
-    let (ws_stream, _) = connect_async("wss://listen.moe/gateway_v2").await?;
-    eprintln!("[meta] Connected to LISTEN.moe gateway");
+    let url = station.ws_url();
+    let (ws_stream, _) = connect_async(url).await?;
+    println!("[meta] Connected to LISTEN.moe gateway");
 
-    let (_write, mut read) = ws_stream.split();
+    let (mut write, mut read) = ws_stream.split();
 
-    // 1. Read hello (op 0)
+    // 1. Read hello (op 0) and prepare heartbeat
+    let mut heartbeat_ms: Option<u64> = None;
+
     if let Some(msg) = read.next().await {
         let msg = msg?;
         if msg.is_text() {
-            let _txt = msg.into_text()?;
+            let txt = msg.into_text()?;
+            if let Ok(json) = serde_json::from_str::<Value>(&txt) {
+                let op = json["op"].as_i64().unwrap_or(-1);
+                if op == 0 {
+                    heartbeat_ms = json["d"]["heartbeat"].as_u64();
+                }
+            }
         }
+    }
+
+    // Spawn heartbeat sender if there is an interval
+    if let Some(ms) = heartbeat_ms {
+        let running_for_hb = running.clone();
+        tokio::spawn(async move {
+            let interval = Duration::from_millis(ms);
+            loop {
+                if !running_for_hb.load(Ordering::SeqCst) {
+                    break;
+                }
+
+                tokio::time::sleep(interval).await;
+
+                if !running_for_hb.load(Ordering::SeqCst) {
+                    break;
+                }
+
+                if let Err(err) = write.send(Message::Text(r#"{"op":9}"#.into())).await {
+                    eprintln!("[meta] heartbeat send error: {err}");
+                    break;
+                }
+            }
+        });
     }
 
     // 2. Process messages, look for TRACK_UPDATE
@@ -130,6 +171,11 @@ async fn run_once(
 
         let op = json["op"].as_i64().unwrap_or(-1);
         let t = json["t"].as_str().unwrap_or("");
+
+        if op == 10 {
+            println!("[meta] Heartbeat ACK");
+            continue;
+        }
 
         if op == 1 && t == "TRACK_UPDATE" {
             if let Some(info) = parse_track_info(&json) {

@@ -15,6 +15,8 @@ use symphonia::core::io::{MediaSource, MediaSourceStream};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 
+use crate::station::Station;
+
 // Wrap blocking HTTP response as a Symphonia MediaSource.
 struct HttpSource {
     inner: Response,
@@ -48,29 +50,42 @@ impl MediaSource for HttpSource {
 }
 
 pub struct ListenMoeRadio {
+    station: Station,
     stop_flag: Arc<AtomicBool>,
     handle: Option<JoinHandle<()>>,
 }
 
 impl ListenMoeRadio {
-    pub fn new() -> Self {
+    pub fn new(station: Station) -> Self {
         Self {
+            station,
             stop_flag: Arc::new(AtomicBool::new(false)),
             handle: None,
         }
     }
 
+    pub fn set_station(&mut self, station: Station) {
+        let was_running = self.handle.is_some();
+        if was_running {
+            self.stop();
+        }
+        self.station = station;
+        if was_running {
+            self.start();
+        }
+    }
+
     pub fn start(&mut self) {
         if self.handle.is_some() {
-            // already running
             return;
         }
 
         self.stop_flag.store(false, Ordering::Relaxed);
         let stop = self.stop_flag.clone();
+        let station = self.station;
 
         let handle = thread::spawn(move || {
-            if let Err(err) = run_listenmoe_stream(stop) {
+            if let Err(err) = run_listenmoe_stream(station, stop) {
                 eprintln!("listen.moe stream exited with error: {err}");
             }
         });
@@ -87,8 +102,8 @@ impl ListenMoeRadio {
     }
 }
 
-fn run_listenmoe_stream(stop: Arc<AtomicBool>) -> Result<(), Box<dyn Error>> {
-    let url = "https://listen.moe/stream";
+fn run_listenmoe_stream(station: Station, stop: Arc<AtomicBool>) -> Result<(), Box<dyn Error>> {
+    let url = station.stream_url();
 
     println!("Connecting to {url}…");
 

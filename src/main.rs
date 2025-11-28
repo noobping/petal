@@ -3,10 +3,12 @@ mod setup;
 
 mod listen;
 mod meta;
+mod station;
 
 use crate::listen::ListenMoeRadio;
 use crate::meta::Meta;
 use crate::meta::TrackInfo;
+use crate::station::Station;
 
 #[cfg(feature = "setup")]
 use crate::setup::*;
@@ -33,11 +35,12 @@ fn main() {
 }
 
 fn build_ui(app: &Application) {
-    let radio = Rc::new(RefCell::new(ListenMoeRadio::new()));
+    let station = Station::Jpop;
+    let radio = Rc::new(RefCell::new(ListenMoeRadio::new(station)));
 
     // Channel from Meta worker to main thread
     let (tx, rx) = mpsc::channel::<TrackInfo>();
-    let meta = Meta::new(tx);
+    let meta = Meta::new(station, tx);
     let win_title = WindowTitle::new("LISTEN.moe", "JPOP/KPOP Radio");
 
     let play_button = Button::from_icon_name("media-playback-start-symbolic");
