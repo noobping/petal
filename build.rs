@@ -1,11 +1,12 @@
-mod config {
-    include!("src/config.rs");
-}
-
-#[cfg(feature = "setup")]
-use config::RESOURCE_ID;
 #[cfg(not(feature = "setup"))]
-use config::{APP_ID, RESOURCE_ID};
+#[cfg(debug_assertions)]
+pub const APP_ID: &str = concat!("dev.noobping.", env!("CARGO_PKG_NAME"), ".develop");
+#[cfg(not(feature = "setup"))]
+#[cfg(not(debug_assertions))]
+pub const APP_ID: &str = concat!("dev.noobping.", env!("CARGO_PKG_NAME"));
+
+pub const RESOURCE_ID: &str = concat!("/dev/noobping/", env!("CARGO_PKG_NAME"));
+
 use std::{fs, path::Path};
 
 fn main() {
