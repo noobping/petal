@@ -1,5 +1,5 @@
 [package]
-name = "listenmoe-radio"
+name = "listenmoe"
 description = "Anime/Japanese Radio powered by LISTEN.moe!"
 version = "0.1.1"
 edition = "2021"

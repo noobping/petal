@@ -1,3 +1,4 @@
+#[cfg(target_os = "linux")]
 #[cfg(feature = "setup")]
 mod setup;
 
