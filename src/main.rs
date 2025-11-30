@@ -110,6 +110,7 @@ fn build_ui(app: &Application) {
     let art_popover = Popover::builder()
         .has_arrow(true)
         .position(gtk::PositionType::Bottom)
+        .autohide(true)
         .child(&art_picture)
         .build();
     art_popover.set_parent(&header);
