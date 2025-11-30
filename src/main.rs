@@ -21,12 +21,14 @@ use adw::prelude::*;
 use adw::{Application, WindowTitle};
 use gtk::{
     gdk::{gdk_pixbuf::Pixbuf, Display, Texture},
-    gio::{resources_register_include, Cancellable, MemoryInputStream, File, Menu, SimpleAction},
-    ApplicationWindow, Box, Button, GestureClick, HeaderBar, IconTheme, MenuButton, Orientation,
+    gio::{resources_register_include, Cancellable, MemoryInputStream, Menu, SimpleAction},
+    ApplicationWindow, Button, GestureClick, HeaderBar, IconTheme, MenuButton, Orientation,
     Picture, Popover,
 };
+use std::error::Error;
 use std::sync::mpsc;
 use std::sync::mpsc::TryRecvError;
+use std::thread;
 use std::time::Duration;
 
 fn main() {
@@ -47,6 +49,7 @@ fn build_ui(app: &Application) {
     // Channel from Meta worker to main thread
     let (tx, rx) = mpsc::channel::<TrackInfo>();
     let meta = Meta::new(station, tx);
+    let (cover_tx, cover_rx) = mpsc::channel::<Result<Vec<u8>, String>>();
     let win_title = WindowTitle::new("LISTEN.moe", "JPOP/KPOP Radio");
 
     let play_button = Button::from_icon_name("media-playback-start-symbolic");
@@ -101,7 +104,7 @@ fn build_ui(app: &Application) {
         .build();
 
     // Headerbar with buttons
-    let buttons = Box::new(Orientation::Horizontal, 0);
+    let buttons = gtk::Box::new(Orientation::Horizontal, 0);
     buttons.append(&more_button);
     buttons.append(&play_button);
     buttons.append(&stop_button);
@@ -130,7 +133,7 @@ fn build_ui(app: &Application) {
     art_picture.add_controller(click);
 
     // Tiny dummy content so GTK can shrink the window
-    let dummy = Box::new(Orientation::Vertical, 0);
+    let dummy = gtk::Box::new(Orientation::Vertical, 0);
     dummy.set_height_request(0);
     dummy.set_vexpand(false);
 
@@ -301,7 +304,10 @@ fn build_ui(app: &Application) {
         let win = win_title.clone();
         let art_popover = art_popover.clone();
         let art_picture = art_picture.clone();
+        let cover_rx = cover_rx;
+        let cover_tx = cover_tx.clone();
         glib::timeout_add_local(Duration::from_millis(100), move || {
+            // Handle metadata from Meta worker
             loop {
                 match rx.try_recv() {
                     Ok(info) => {
@@ -310,7 +316,13 @@ fn build_ui(app: &Application) {
 
                         let image_url = info.album_cover.clone().or(info.artist_image.clone());
                         if let Some(url) = image_url {
-                            load_cover_async(url, &art_picture, &art_popover);
+                            // Spawn HTTP worker for this cover
+                            let tx = cover_tx.clone();
+                            thread::spawn(move || {
+                                let result =
+                                    fetch_cover_bytes_blocking(&url).map_err(|e| e.to_string());
+                                let _ = tx.send(result);
+                            });
                         } else {
                             art_popover.popdown();
                         }
@@ -324,6 +336,45 @@ fn build_ui(app: &Application) {
                 }
             }
 
+            // Handle cover bytes from HTTP worker
+            loop {
+                match cover_rx.try_recv() {
+                    Ok(Ok(bytes_vec)) => {
+                        let bytes = glib::Bytes::from_owned(bytes_vec);
+                        let stream = MemoryInputStream::from_bytes(&bytes);
+
+                        match Pixbuf::from_stream_at_scale(
+                            &stream,
+                            250,  // max width
+                            250,  // max height
+                            true, // preserve aspect
+                            None::<&Cancellable>,
+                        ) {
+                            Ok(pixbuf) => {
+                                let texture = Texture::for_pixbuf(&pixbuf);
+                                art_picture.set_paintable(Some(&texture));
+                                art_popover.popup();
+                            }
+                            Err(err) => {
+                                eprintln!("Failed to decode cover pixbuf: {err}");
+                                art_popover.popdown();
+                            }
+                        }
+                    }
+                    Ok(Err(err)) => {
+                        eprintln!("Failed to load cover bytes: {err}");
+                        art_popover.popdown();
+                    }
+                    Err(TryRecvError::Empty) => {
+                        break;
+                    }
+                    Err(TryRecvError::Disconnected) => {
+                        // HTTP worker channel died; stop listening
+                        return glib::ControlFlow::Break;
+                    }
+                }
+            }
+
             glib::ControlFlow::Continue
         });
     }
@@ -331,39 +382,12 @@ fn build_ui(app: &Application) {
     window.present();
 }
 
-fn load_cover_async(url: String, art_picture: &Picture, art_popover: &Popover) {
-    let file = File::for_uri(&url);
-    let art_picture = art_picture.clone();
-    let art_popover = art_popover.clone();
-    file.clone().load_bytes_async(
-        None::<&Cancellable>,
-        move |_| {
-            match file.load_bytes(None::<&Cancellable>) {
-                Ok((bytes, _etag)) => {
-                    let stream = MemoryInputStream::from_bytes(&bytes);
-                    match Pixbuf::from_stream_at_scale(
-                        &stream,
-                        250,  // max width
-                        250,  // max height
-                        true, // keep aspect
-                        None::<&Cancellable>,
-                    ) {
-                        Ok(pixbuf) => {
-                            let texture = Texture::for_pixbuf(&pixbuf);
-                            art_picture.set_paintable(Some(&texture));
-                            art_popover.popup();
-                        }
-                        Err(err) => {
-                            eprintln!("Failed to decode cover pixbuf: {err}");
-                            art_popover.popdown();
-                        }
-                    }
-                }
-                Err(err) => {
-                    eprintln!("Failed to load cover bytes: {err}");
-                    art_popover.popdown();
-                }
-            }
-        },
-    );
+pub fn fetch_cover_bytes_blocking(url: &str) -> Result<Vec<u8>, Box<dyn Error + Send + Sync>> {
+    let resp = reqwest::blocking::get(url)?;
+    if !resp.status().is_success() {
+        return Err(format!("Non-success status: {}", resp.status()).into());
+    }
+
+    let body = resp.bytes()?;
+    Ok(body.to_vec())
 }
