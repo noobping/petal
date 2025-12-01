@@ -1,0 +1,48 @@
+name: Windows GTK4 Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    env:
+      MSYS2_PATH: C:\tools\msys64
+      PKG_CONFIG_PATH: C:\tools\msys64\mingw64\lib\pkgconfig
+      PATH: C:\tools\msys64\mingw64\bin;C:\tools\msys64\usr\bin;${{ env.PATH }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MSYS2
+        run: choco install msys2 --no-progress -y
+
+      - name: Update MSYS2
+        run: C:\tools\msys64\usr\bin\bash -lc "pacman -Syu --noconfirm"
+
+      - name: Install GTK4 + Libadwaita
+        run: |
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-toolchain"
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-gtk4"
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-libadwaita"
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-pkgconf"
+          C:\tools\msys64\usr\bin\bash -lc "pacman -S --noconfirm mingw-w64-x86_64-make"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add GNU Windows target
+        run: rustup target add x86_64-pc-windows-gnu
+
+      - name: Build
+        run: cargo build --release --target x86_64-pc-windows-gnu
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: listenmoe-windows
+          path: target/x86_64-pc-windows-gnu/release/listenmoe.exe
