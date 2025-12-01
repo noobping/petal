@@ -1,0 +1,88 @@
+name: Linux Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
+
+    env:
+      CARGO_TERM_COLOR: always
+      BIN_NAME: listenmoe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: |
+            x86_64-unknown-linux-gnu
+            aarch64-unknown-linux-gnu
+
+      - name: Install system dependencies (GTK4 + libadwaita)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            pkg-config \
+            libgtk-4-dev \
+            libadwaita-1-dev \
+            libglib2.0-dev-bin
+
+      - name: Extra deps for aarch64 cross-compilation
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: |
+          # Enable arm64 architecture
+          sudo dpkg --add-architecture arm64
+          sudo apt-get update
+
+          # Cross toolchain + arm64 dev packages
+          sudo apt-get install -y \
+            crossbuild-essential-arm64 \
+            libgtk-4-dev:arm64 \
+            libadwaita-1-dev:arm64 \
+            libglib2.0-dev:arm64
+
+          # Use the arm64 pkg-config when building for aarch64
+          echo "PKG_CONFIG=aarch64-linux-gnu-pkg-config" >> $GITHUB_ENV
+          echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
+
+      - name: Build (release)
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+
+      - name: List produced binary
+        run: ls -R target/${{ matrix.target }}/release
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN_NAME }}-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
+
+      - id: get_latest_release
+        uses: pozetroninc/github-action-get-latest-release@v1
+        with:
+          repository: ${{ github.repository }}
+
+      - name: Upload asset to release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.get_latest_release.outputs.release }}
+          allowUpdates: true
+          removeArtifacts: false
+          artifacts: ${{ env.BIN_NAME }}-${{ matrix.target }}
+          token: ${{ secrets.GITHUB_TOKEN }}

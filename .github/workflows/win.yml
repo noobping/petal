@@ -1,4 +1,4 @@
-name: Windows GTK4 Build
+name: Windows Build
 
 on:
   workflow_dispatch:
