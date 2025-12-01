@@ -112,7 +112,7 @@ pub fn build_ui(app: &Application) {
     });
     window.add_action(&{
         let win = window.clone();
-        make_action("quite", move || win.close())
+        make_action("quit", move || win.close())
     });
     window.add_action(&{
         let win_clone = window.clone();
@@ -238,7 +238,7 @@ pub fn build_ui(app: &Application) {
     dummy.set_vexpand(false);
 
     let close_btn = Button::from_icon_name("window-close-symbolic");
-    close_btn.set_action_name(Some("win.quite"));
+    close_btn.set_action_name(Some("win.quit"));
     header.pack_end(&close_btn);
 
     window.set_titlebar(Some(&header));
@@ -254,14 +254,16 @@ pub fn build_ui(app: &Application) {
         );
     }
     menu.append(Some("About"), Some("win.about"));
-    menu.append(Some("Quite"), Some("win.quite"));
+    #[cfg(feature = "setup")]
+    menu.append(Some(if is_installed_locally() { "Uninstall" } else { "Install" } ), Some("win.setup"));
+    menu.append(Some("Quit"), Some("win.quit"));
 
     // shortcuts
     #[cfg(feature = "setup")]
     app.set_accels_for_action("win.setup", &["F2"]);
     app.set_accels_for_action("win.about", &["F1"]);
     app.set_accels_for_action("win.copy", &["<primary>c"]);
-    app.set_accels_for_action("win.quite", &["<primary>q", "Escape"]);
+    app.set_accels_for_action("win.quit", &["<primary>q", "Escape"]);
     app.set_accels_for_action("win.play", &["XF86AudioPlay"]);
     app.set_accels_for_action("win.stop", &["XF86AudioStop", "XF86AudioPause"]);
     app.set_accels_for_action("win.jpop", &["<primary>j", "XF86AudioPrev", "<primary>z"]);
