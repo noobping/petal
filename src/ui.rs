@@ -171,7 +171,7 @@ pub fn build_ui(app: &Application) {
     });
 
     #[cfg(feature = "setup")]
-    window.add_action(&make_action("copy", move || {
+    window.add_action(&make_action("setup", move || {
         if !can_install_locally() {
             return;
         }
