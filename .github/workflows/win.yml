@@ -73,8 +73,15 @@ jobs:
           name: listenmoe-windows
           path: listenmoe-windows.zip
 
+      - name: Get latest tag
+        run: |
+          latest_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          echo "Latest tag: $latest_tag"
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.LATEST_TAG }}
           files: "listenmoe-windows.zip"
           overwrite_files: true
