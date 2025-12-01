@@ -73,11 +73,6 @@ jobs:
           name: listenmoe-windows
           path: listenmoe-windows.zip
 
-      - id: get_latest_release
-        uses: pozetroninc/github-action-get-latest-release@v1
-        with:
-          repository: ${{ github.repository }}
-
       - name: Release
         uses: softprops/action-gh-release@v2
         with:

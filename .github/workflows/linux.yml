@@ -75,11 +75,6 @@ jobs:
           name: ${{ env.BIN_NAME }}-${{ matrix.target }}
           path: target/${{ matrix.target }}/release/${{ env.BIN_NAME }}
 
-      - id: get_latest_release
-        uses: pozetroninc/github-action-get-latest-release@v1
-        with:
-          repository: ${{ github.repository }}
-
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
