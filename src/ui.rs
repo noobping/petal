@@ -125,6 +125,9 @@ pub fn build_ui(app: &Application) {
                 .application_icon(APP_ID)
                 .version(env!("CARGO_PKG_VERSION"))
                 .developers(&authors[..])
+                .website(option_env!("CARGO_PKG_HOMEPAGE").unwrap_or(""))
+                .issue_url(option_env!("ISSUE_TRACKER").unwrap_or(""))
+                .license_type(gtk::License::MitX11)
                 .comments(option_env!("CARGO_PKG_DESCRIPTION").unwrap_or(""))
                 .build();
             about.present(Some(&win_clone));

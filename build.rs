@@ -10,6 +10,7 @@ fn main() {
     let summary = env::var("CARGO_PKG_DESCRIPTION").unwrap_or_else(|_| "Anime/Japanese Radio".to_string());
     let homepage = env::var("CARGO_PKG_HOMEPAGE").unwrap_or_else(|_| "https://listen.moe/".to_string());
     let license = env::var("CARGO_PKG_LICENSE").unwrap_or_else(|_| "MIT".to_string());
+    let issue_tracker = read_issue_tracker();
 
     let app_id = if cfg!(debug_assertions) {
         format!("dev.noobping.{project}.develop")
@@ -21,6 +22,7 @@ fn main() {
     // Expose APP_ID and RESOURCE_ID to your main crate:
     println!("cargo:rustc-env=APP_ID={app_id}");
     println!("cargo:rustc-env=RESOURCE_ID={resource_id}");
+    println!("cargo:rustc-env=ISSUE_TRACKER={issue_tracker}");
 
     // Make Cargo rerun if these change
     println!("cargo:rerun-if-changed=build.rs");
@@ -51,7 +53,7 @@ fn main() {
     #[cfg(not(feature = "setup"))]
     {
         desktop_file(&project, &version, &summary, &app_id);
-        metainfo_file(&data_dir, &app_id, &authors.first().expect("unknown author"), &repository, &project, &summary, &homepage, &license, &version);
+        metainfo_file(&data_dir, &app_id, &authors.first().expect("unknown author"), &repository, &project, &summary, &homepage, &license, &version, &issue_tracker);
     }
 }
 
@@ -101,8 +103,8 @@ fn metainfo_file(
     homepage: &str,
     license: &str,
     version: &str,
+    issue_tracker: &str,
 ) {
-    let issue_tracker = read_issue_tracker();
     let contents = format!(
         r#"<?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
