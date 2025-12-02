@@ -58,10 +58,12 @@ jobs:
           set -euo pipefail
 
           EXE=\"$GITHUB_WORKSPACE/target/x86_64-pc-windows-gnu/release/listenmoe.exe\"
-          OUT=\"$RUNNER_TEMP/bundle\"
+          OUT=\"$GITHUB_WORKSPACE/bundle\"
+
+          rm -rf \"$OUT\"
           mkdir -p \"$OUT\"
 
-          # copy the exe
+          echo \"Copying exe...\"
           cp \"$EXE\" \"$OUT/\"
 
           echo 'Collecting DLL dependencies with ntldd...'
@@ -70,20 +72,32 @@ jobs:
           | tr -d '\r' \
           | sort -u \
           | while read -r dll; do
-            # only copy real files and only from mingw64 (skip system DLLs)
             if [ -n \"\$dll\" ] && [ -f \"\$dll\" ] && echo \"\$dll\" | grep -q 'mingw64/bin'; then
               echo \"Copying \$dll\"
               cp -u \"\$dll\" \"$OUT/\"
             fi
           done
+
+          echo 'Bundle contents:'
+          ls -l \"$OUT\"
           "
 
       - name: Create release zip
         shell: pwsh
         run: |
-          $zip = Join-Path $env:GITHUB_WORKSPACE 'listenmoe-windows.zip'
-          $src = Join-Path $env:RUNNER_TEMP 'bundle\*'
-          if (Test-Path $zip) { Remove-Item $zip -Force }
+          $workspace = $env:GITHUB_WORKSPACE
+          $bundleDir = Join-Path $workspace 'bundle'
+          if (-not (Test-Path $bundleDir)) {
+            Write-Error "Bundle dir not found: $bundleDir"
+          }
+
+          $zip = Join-Path $workspace 'listenmoe-windows.zip'
+
+          if (Test-Path $zip) {
+            Remove-Item $zip -Force
+          }
+
+          $src = Join-Path $bundleDir '*'
           Compress-Archive -Path $src -DestinationPath $zip -Force
 
       - name: Upload artifact
