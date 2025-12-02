@@ -52,35 +52,38 @@ jobs:
       - name: Build
         run: cargo build --release --target x86_64-pc-windows-gnu
 
-      - name: Bundle exe + DLLs
+      - name: Bundle exe + DLLs (flat)
+        shell: bash
         run: |
-          C:\tools\msys64\usr\bin\bash -lc "
           set -euo pipefail
 
-          EXE=\"$GITHUB_WORKSPACE/target/x86_64-pc-windows-gnu/release/listenmoe.exe\"
-          OUT=\"$GITHUB_WORKSPACE/bundle\"
+          EXE="$GITHUB_WORKSPACE/target/x86_64-pc-windows-gnu/release/listenmoe.exe"
+          OUT="$GITHUB_WORKSPACE/bundle"
 
-          rm -rf \"$OUT\"
-          mkdir -p \"$OUT\"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "EXE: $EXE"
+          echo "OUT: $OUT"
 
-          echo \"Copying exe...\"
-          cp \"$EXE\" \"$OUT/\"
+          rm -rf "$OUT"
+          mkdir -p "$OUT"
 
-          echo 'Collecting DLL dependencies with ntldd...'
-          ntldd -R \"$EXE\" \
-          | awk '/=>/ { print \$3 }' \
+          echo "Copying exe..."
+          cp "$EXE" "$OUT/"
+
+          echo "Collecting DLL dependencies with ntldd..."
+          /c/tools/msys64/usr/bin/ntldd.exe -R "$EXE" \
+          | awk '/=>/ { print $3 }' \
           | tr -d '\r' \
           | sort -u \
           | while read -r dll; do
-            if [ -n \"\$dll\" ] && [ -f \"\$dll\" ] && echo \"\$dll\" | grep -q 'mingw64/bin'; then
-              echo \"Copying \$dll\"
-              cp -u \"\$dll\" \"$OUT/\"
-            fi
+          if [ -n "$dll" ] && [ -f "$dll" ] && echo "$dll" | grep -q 'mingw64/bin'; then
+            echo "Copying $dll"
+            cp -u "$dll" "$OUT/"
+          fi
           done
 
-          echo 'Bundle contents:'
-          ls -l \"$OUT\"
-          "
+          echo "Bundle contents:"
+          ls -l "$OUT"
 
       - name: Create release zip
         shell: pwsh
@@ -92,7 +95,6 @@ jobs:
           }
 
           $zip = Join-Path $workspace 'listenmoe-windows.zip'
-
           if (Test-Path $zip) {
             Remove-Item $zip -Force
           }
