@@ -76,19 +76,19 @@ jobs:
       - name: Build
         run: cargo build --release --features setup
 
-      - name: Debug
-        run: ls -R target
+      - name: Rename
+        run: mv target/release/${{ env.BIN_NAME }} ${{ env.BIN_NAME }}-${{ matrix.target }}
 
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.BIN_NAME }}-${{ matrix.target }}
-          path: target/release/${{ env.BIN_NAME }}
+          path: ${{ env.BIN_NAME }}-${{ matrix.target }}
 
       - name: Release
         if: ${{ env.TAG_NAME != '' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: target/release/${{ env.BIN_NAME }}
+          files: ${{ env.BIN_NAME }}-${{ matrix.target }}
           overwrite_files: true
