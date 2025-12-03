@@ -2,9 +2,9 @@
 [![Windows Build](https://github.com/noobping/listenmoe-gnome-app/actions/workflows/win.yml/badge.svg)](https://github.com/noobping/listenmoe-gnome-app/actions/workflows/win.yml)
 [![Linux Build](https://github.com/noobping/listenmoe-gnome-app/actions/workflows/linux.yml/badge.svg)](https://github.com/noobping/listenmoe-gnome-app/actions/workflows/linux.yml)
 
-# A tiny Gnome App for LISTEN.moe
+# The world's cutest radio
 
-Anime/Japanese Radio powered by LISTEN.moe!
+The world's cutest radio. Dive into pure kawaii energy with nonstop Japanese and Korean hits, streamed straight from LISTEN.moe.
 
 ![screenshot](data/screenshot.png)
 

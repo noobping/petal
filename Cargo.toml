@@ -1,10 +1,10 @@
 [package]
 name = "listenmoe"
-description = "Anime/Japanese Radio powered by LISTEN.moe!"
+description = "The world's cutest radio. Powered by LISTEN.moe!"
 repository = "https://github.com/noobping/listenmoe-gnome-app"
 license = "MIT"
 homepage = "https://listen.moe/"
-authors = ["noobping"]
+authors = ["Nick <hello@noobping.dev>"]
 version = "0.1.4"
 edition = "2021"
 
