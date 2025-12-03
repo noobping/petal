@@ -19,8 +19,7 @@ flatpak install flatpaks dev.noobping.listenmoe
 
 ## Stand-alone Executable
 
-You can download a stand-alone binary from the [GitHub Releases](https://github.com/noobping/listenmoe-gnome-app/releases/latest) page.
-After downloading:
+You can download a stand-alone binary from the [GitHub Releases](https://github.com/noobping/listenmoe-gnome-app/releases/latest) page. After downloading:
 
 1. Mark it as executable:
 
