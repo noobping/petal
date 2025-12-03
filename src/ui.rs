@@ -176,17 +176,6 @@ pub fn build_ui(app: &Application) {
         })
     });
 
-    #[cfg(all(target_os = "linux", feature = "setup"))]
-    window.add_action(&make_action("setup", move || {
-        if !can_install_locally() {
-            return;
-        }
-        let _ = match is_installed_locally() {
-            true => uninstall_locally(),
-            false => install_locally(),
-        };
-    }));
-
     // Build UI
     let menu = Menu::new();
     menu.append(Some("Copy title & artist"), Some("win.copy"));
@@ -259,9 +248,32 @@ pub fn build_ui(app: &Application) {
         );
     }
     menu.append(Some("About"), Some("win.about"));
+
+    #[cfg(all(target_os = "linux", feature = "setup"))]
+    let setup_index = menu.n_items();
     #[cfg(all(target_os = "linux", feature = "setup"))]
     menu.append(Some(if is_installed_locally() { "Uninstall" } else { "Install" } ), Some("win.setup"));
+
     menu.append(Some("Quit"), Some("win.quit"));
+
+    #[cfg(all(target_os = "linux", feature = "setup"))]
+    window.add_action(&{
+        let menu_clone = menu.clone();
+        let index = setup_index.clone();
+        make_action("setup", move || {
+            if !can_install_locally() {
+                return;
+            }
+            let was_installed = is_installed_locally();
+            let _ = match was_installed {
+                true => uninstall_locally(),
+                false => install_locally(),
+            };
+            let new_label = if was_installed { "Install" } else { "Uninstall" };
+            menu_clone.remove(setup_index);
+            menu_clone.insert(setup_index, Some(new_label), Some("win.setup"));
+        })
+    });
 
     #[cfg(all(target_os = "linux", feature = "setup"))]
     app.set_accels_for_action("win.setup", &["F2"]);
