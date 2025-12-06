@@ -28,10 +28,13 @@ fn find_locale_dir() -> PathBuf {
         }
     }
 
+    // Flatpak / app prefix
+    let app_share_locale = Path::new("/app/share/locale");
+    if app_share_locale.is_dir() {
+        return app_share_locale.to_path_buf();
+    }
+
     // User-level data dir
-    // Linux → ~/.local/share/<APP_ID>/locale
-    // macOS → ~/Library/Application Support/<APP_ID>/locale
-    // Windows → %APPDATA%\<APP_ID>\locale
     if let Some(base) = dirs::data_local_dir() {
         let candidate = base.join(APP_ID).join("locale");
         if candidate.is_dir() {
@@ -39,22 +42,23 @@ fn find_locale_dir() -> PathBuf {
         }
     }
 
-    // System locale directory (/usr/share/locale)
-    // `dirs-next` does not expose `/usr/share`, so we check it manually.
+    // System locale directory
     let sys_dir = Path::new("/usr/share/locale");
     if sys_dir.is_dir() {
         return sys_dir.to_path_buf();
     }
 
-    // Absolute fallback, ensure dev folder exists
+    // Fallback: dev dir
     let _ = fs::create_dir_all(&dev_dir);
-    dev_dir
+    dev_dir.to_path_buf()
 }
 
 pub fn init_i18n() {
     setlocale(LocaleCategory::LcAll, "");
 
     let dir = find_locale_dir();
+    println!("Using locale dir: {}", dir.display());
+
     let dir_str = dir
         .to_str()
         .expect("Locale path must be UTF-8 for gettext");
@@ -62,19 +66,4 @@ pub fn init_i18n() {
     bindtextdomain(APP_ID, dir_str).expect("bindtextdomain failed");
     bind_textdomain_codeset(APP_ID, "UTF-8").expect("bind codeset failed");
     textdomain(APP_ID).expect("textdomain failed");
-}
-
-#[macro_export]
-macro_rules! t {
-    ($msg:literal) => {
-        &gettextrs::gettext($msg)
-    };
-}
-
-#[macro_export]
-macro_rules! v {
-    ($msg:literal) => {{
-        let value = std::env::var($msg).unwrap_or_else(|_| panic!(concat!($msg, " not found")));
-        gettextrs::gettext(&value)
-    }};
 }

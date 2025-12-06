@@ -4,8 +4,7 @@ use std::io::{Error, ErrorKind};
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use std::{env, fs};
-
-use crate::v;
+use gettextrs::gettext;
 
 const APP_ID: &str = env!("APP_ID");
 const RESOURCE_ID: &str = env!("RESOURCE_ID");
@@ -123,9 +122,9 @@ fn is_writable(dir: &Path) -> bool {
 }
 
 fn write_desktop_file(apps_path: &Path, bin_path: &Path) -> std::io::Result<()> {
-    let project = v!("CARGO_PKG_NAME");
+    let project = gettext(env!("CARGO_PKG_NAME"));
     let version = env!("CARGO_PKG_VERSION");
-    let comment = v!("CARGO_PKG_DESCRIPTION");
+    let comment = gettext(env!("CARGO_PKG_DESCRIPTION"));
     let exec = bin_path.display(); // absolute path to the installed binary
     let contents = format!(
         "[Desktop Entry]

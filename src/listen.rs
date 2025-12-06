@@ -171,7 +171,7 @@ fn run_listenmoe_stream(station: Station, rx: mpsc::Receiver<Control>) -> Result
         let packet = match format.next_packet() {
             Ok(p) => p,
             Err(SymphoniaError::ResetRequired) => {
-                eprintln!("Stream reset, reconfiguring decoder…");
+                println!("Stream reset, reconfiguring decoder…");
                 let new_track = format
                     .tracks()
                     .iter()
@@ -200,7 +200,7 @@ fn run_listenmoe_stream(station: Station, rx: mpsc::Receiver<Control>) -> Result
             Ok(buf) => buf,
             Err(SymphoniaError::DecodeError(_)) => continue,
             Err(SymphoniaError::ResetRequired) => {
-                eprintln!("Decoder reset required, rebuilding decoder…");
+                println!("Decoder reset required, rebuilding decoder…");
                 let new_track = format
                     .tracks()
                     .iter()

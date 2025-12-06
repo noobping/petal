@@ -13,7 +13,6 @@ mod ui;
 const APP_ID: &str = env!("APP_ID");
 #[cfg(any(debug_assertions, feature = "setup", feature = "icon"))]
 const RESOURCE_ID: &str = env!("RESOURCE_ID");
-use adw::gtk::{gdk::Display, IconTheme};
 use adw::prelude::*;
 use adw::Application;
 #[cfg(any(debug_assertions, feature = "setup", feature = "icon"))]

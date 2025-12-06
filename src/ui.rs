@@ -4,7 +4,6 @@ use crate::station::Station;
 
 #[cfg(all(target_os = "linux", feature = "setup"))]
 use crate::setup::{can_install_locally, install_locally, is_installed_locally, uninstall_locally};
-use crate::{v,t};
 
 use adw::glib;
 use adw::gtk::{
@@ -24,6 +23,7 @@ use std::rc::Rc;
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
+use gettextrs::gettext;
 
 const COVER_MAX_SIZE: i32 = 250;
 const APP_ID: &str = env!("APP_ID");
@@ -81,7 +81,7 @@ pub fn build_ui(app: &Application) {
 
     let window = ApplicationWindow::builder()
         .application(app)
-        .title(t!("Listen.moe Radio"))
+        .title(&gettext("Listen.moe Radio"))
         .icon_name(APP_ID)
         .default_width(300)
         .default_height(40)
@@ -144,7 +144,7 @@ pub fn build_ui(app: &Application) {
             stop.set_visible(false);
             play.set_visible(true);
             win.set_title("LISTEN.moe");
-            win.set_subtitle(t!("JPOP/KPOP Radio"));
+            win.set_subtitle(&gettext("JPOP/KPOP Radio"));
             #[cfg(all(target_os = "linux", feature = "controls"))]
             let _ = controls.borrow_mut().set_playback(MediaPlayback::Paused { progress: None });
         })
@@ -158,14 +158,14 @@ pub fn build_ui(app: &Application) {
         make_action("about", move || {
             let authors: Vec<_> = env!("CARGO_PKG_AUTHORS").split(':').collect();
             let about = adw::AboutDialog::builder()
-                .application_name(v!("CARGO_PKG_NAME"))
+                .application_name(gettext(env!("CARGO_PKG_NAME")))
                 .application_icon(APP_ID)
                 .version(env!("CARGO_PKG_VERSION"))
                 .developers(&authors[..])
                 .website(option_env!("CARGO_PKG_HOMEPAGE").unwrap_or(""))
                 .issue_url(option_env!("ISSUE_TRACKER").unwrap_or(""))
                 .license_type(gtk::License::MitX11)
-                .comments(v!("CARGO_PKG_DESCRIPTION"))
+                .comments(gettext(env!("CARGO_PKG_DESCRIPTION")))
                 .build();
             about.present(Some(&win_clone));
         })
@@ -214,7 +214,7 @@ pub fn build_ui(app: &Application) {
 
     // Build UI
     let menu = Menu::new();
-    menu.append(Some(t!("Copy title & artist")), Some("win.copy"));
+    menu.append(Some(&gettext("Copy title & artist")), Some("win.copy"));
     let more_button = MenuButton::builder()
         .icon_name("view-more-symbolic")
         .tooltip_text("Main Menu")
@@ -279,18 +279,18 @@ pub fn build_ui(app: &Application) {
         let action = create_station_action(station, &play_button, &window, &radio, &meta);
         window.add_action(&action);
         menu.append(
-            Some(&format!("{} {}", t!("Play %s"), station.display_name())),
+            Some(gettext("Play %s").replace("%s", station.display_name()).as_str()),
             Some(&format!("win.{}", station.name())),
         );
     }
-    menu.append(Some(t!("About")), Some("win.about"));
+    menu.append(Some(&gettext("About")), Some("win.about"));
 
     #[cfg(all(target_os = "linux", feature = "setup"))]
     let setup_index = menu.n_items();
     #[cfg(all(target_os = "linux", feature = "setup"))]
     menu.append(Some(if is_installed_locally() { "Uninstall" } else { "Install" } ), Some("win.setup"));
 
-    menu.append(Some(t!("Quit")), Some("win.quit"));
+    menu.append(Some(&gettext("Quit")), Some("win.quit"));
 
     #[cfg(all(target_os = "linux", feature = "setup"))]
     window.add_action(&{
@@ -304,7 +304,7 @@ pub fn build_ui(app: &Application) {
                 true => uninstall_locally(),
                 false => install_locally(),
             };
-            let new_label = if was_installed { t!("Install") } else { t!("Uninstall") };
+            let new_label = if was_installed { &gettext("Install") } else { &gettext("Uninstall") };
             menu_clone.remove(setup_index);
             menu_clone.insert(setup_index, Some(new_label), Some("win.setup"));
         })

@@ -64,8 +64,10 @@ fn main() {
 
     #[cfg(all(target_os = "linux", not(feature = "setup")))]
     {
+        let author = *authors.first().expect("unknown author");
+        let before = author.split('<').next().unwrap();
         desktop_file(&data_dir, &project, &version, &summary, &app_id);
-        metainfo_file(&data_dir, &app_id, &authors.first().expect("unknown author"), &repository, &project, &summary, &homepage, &license, &version, &issue_tracker);
+        metainfo_file(&data_dir, &app_id, &before.trim(), &repository, &project, &summary, &homepage, &license, &version, &issue_tracker);
     }
 }
 

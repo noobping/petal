@@ -25,8 +25,9 @@ AppDir:
         key_url: "https://ftp-master.debian.org/keys/archive-key-12.asc"
     include:
       - ca-certificates
-      - libssl3
+      - gettext
       - libcurl4
+      - libssl3
 
 AppImage:
   arch: x86_64
