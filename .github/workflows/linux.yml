@@ -55,6 +55,7 @@ jobs:
             cargo \
             clang \
             gcc \
+            gettext \
             libadwaita-1-dev \
             libasound2-dev \
             libasound2-dev \
