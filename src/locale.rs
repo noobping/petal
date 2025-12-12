@@ -13,9 +13,27 @@ fn find_locale_dir() -> PathBuf {
         return dev_dir;
     }
 
-    // <exe>/data/locale or <exe>/locale (AppImage, portable build, etc.)
+    // AppImage: translations live in $APPDIR/usr/share/locale
+    if let Ok(appdir) = env::var("APPDIR") {
+        let candidate = Path::new(&appdir).join("usr").join("share").join("locale");
+        if candidate.is_dir() {
+            return candidate;
+        }
+    }
+
+    // Portable: <exe>/../share/locale or <exe>/../usr/share/locale
     if let Ok(exe) = env::current_exe() {
         if let Some(exe_dir) = exe.parent() {
+            let candidate = exe_dir.join("..").join("share").join("locale");
+            if candidate.is_dir() {
+                return candidate;
+            }
+
+            let candidate = exe_dir.join("..").join("usr").join("share").join("locale");
+            if candidate.is_dir() {
+                return candidate;
+            }
+
             let candidate = exe_dir.join("data").join("locale");
             if candidate.is_dir() {
                 return candidate;
