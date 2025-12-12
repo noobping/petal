@@ -13,7 +13,7 @@ fn find_locale_dir() -> PathBuf {
         return dev_dir;
     }
 
-    // AppImage: translations live in $APPDIR/usr/share/locale
+    // AppImage
     if let Ok(appdir) = env::var("APPDIR") {
         let candidate = Path::new(&appdir).join("usr").join("share").join("locale");
         if candidate.is_dir() {
@@ -21,24 +21,9 @@ fn find_locale_dir() -> PathBuf {
         }
     }
 
-    // Portable: <exe>/../share/locale or <exe>/../usr/share/locale
+    // exe dir
     if let Ok(exe) = env::current_exe() {
         if let Some(exe_dir) = exe.parent() {
-            let candidate = exe_dir.join("..").join("share").join("locale");
-            if candidate.is_dir() {
-                return candidate;
-            }
-
-            let candidate = exe_dir.join("..").join("usr").join("share").join("locale");
-            if candidate.is_dir() {
-                return candidate;
-            }
-
-            let candidate = exe_dir.join("data").join("locale");
-            if candidate.is_dir() {
-                return candidate;
-            }
-
             let candidate = exe_dir.join("locale");
             if candidate.is_dir() {
                 return candidate;
@@ -46,7 +31,7 @@ fn find_locale_dir() -> PathBuf {
         }
     }
 
-    // Flatpak / app prefix
+    // Flatpak
     let app_share_locale = Path::new("/app/share/locale");
     if app_share_locale.is_dir() {
         return app_share_locale.to_path_buf();
@@ -66,7 +51,7 @@ fn find_locale_dir() -> PathBuf {
         return sys_dir.to_path_buf();
     }
 
-    // Fallback: dev dir
+    // Fallback
     let _ = fs::create_dir_all(&dev_dir);
     dev_dir.to_path_buf()
 }
