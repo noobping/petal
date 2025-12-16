@@ -119,8 +119,7 @@ impl Listen {
     }
 
     fn stop_inner(inner: &mut Inner) {
-        if let State::Playing { tx } = &inner.state {
-            // Ignore send errors (thread might already be gone)
+        if let State::Playing { tx } | State::Paused { tx } = &inner.state {
             let _ = tx.send(Control::Stop);
         }
         inner.state = State::Stopped;
