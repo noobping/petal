@@ -13,6 +13,16 @@
   <url type="bugtracker">https://github.com/noobping/listenmoe/issues</url>
   <url type="vcs-browser">https://github.com/noobping/listenmoe</url>
 
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </recommends>
+
+  <requires>
+    <display_length compare="ge">300</display_length>
+  </requires>
+
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">mild</content_attribute>
     <content_attribute id="violence-fantasy">none</content_attribute>
