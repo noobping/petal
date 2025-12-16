@@ -23,6 +23,9 @@ use std::time::Duration;
 use gettextrs::gettext;
 
 const COVER_MAX_SIZE: i32 = 250;
+#[cfg(debug_assertions)]
+const APP_ID: &str = "io.github.noobping.listenmoe_develop";
+#[cfg(not(debug_assertions))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
 
 fn make_action<F>(name: &str, f: F) -> SimpleAction
