@@ -165,6 +165,7 @@ fn run_listenmoe_stream(station: Station, rx: mpsc::Receiver<Control>) -> Result
         .get(url)
         .header("User-Agent", "listenmoe-rodio-symphonia/0.1")
         .send()?;
+    #[cfg(debug_assertions)]
     println!("[{}] HTTP status: {}", now_string(), response.status());
     if !response.status().is_success() {
         return Err(format!("HTTP status {}", response.status()).into());

@@ -237,10 +237,7 @@ fn run_meta_loop(
                 }
             }
             Err(err) => {
-                eprintln!(
-                    "[{}] Gateway connection error: {err}, retrying in 5s…",
-                    now_string()
-                );
+                eprintln!("Gateway connection error: {err}, retrying in 5s…");
                 match rx.try_recv() {
                     Ok(Control::Stop) | Err(mpsc::TryRecvError::Disconnected) => return Ok(()),
                     Err(mpsc::TryRecvError::Empty) => thread::sleep(Duration::from_secs(5)),
