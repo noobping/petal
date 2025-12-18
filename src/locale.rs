@@ -52,7 +52,6 @@ fn find_locale_dir() -> PathBuf {
     }
 
     // Fallback
-    let _ = fs::create_dir_all(&dev_dir);
     dev_dir.to_path_buf()
 }
 
