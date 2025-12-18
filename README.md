@@ -1,8 +1,8 @@
+# The world's cutest radio
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Windows Build](https://github.com/noobping/listenmoe/actions/workflows/win.yml/badge.svg)](https://github.com/noobping/listenmoe/actions/workflows/win.yml)
 [![Linux Build](https://github.com/noobping/listenmoe/actions/workflows/linux.yml/badge.svg)](https://github.com/noobping/listenmoe/actions/workflows/linux.yml)
-
-# The world's cutest radio
 
 The world's cutest radio. Dive into pure kawaii energy with nonstop Japanese and Korean hits, streamed straight from [LISTEN.moe](https://listen.moe/).
 
