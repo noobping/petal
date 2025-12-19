@@ -182,7 +182,7 @@ jobs:
           Write-Host "Using candle: $candle"
           Write-Host "Using light : $light"
 
-          $ver = ${{ env.LATEST_TAG }}
+          $ver = "${{ env.LATEST_TAG }}"
 
           & $candle `
             -dBundleDir="$(Resolve-Path bundle)" `
