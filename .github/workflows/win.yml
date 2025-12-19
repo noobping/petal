@@ -20,9 +20,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-tags: true
-          fetch-depth: 0
 
       - name: Install MSYS2
         run: choco install msys2 --no-progress -y
@@ -92,6 +89,123 @@ jobs:
           name: listenmoe-windows
           path: listenmoe-windows.zip
 
+  bundle:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: listenmoe-windows
+          path: dist
+
+      - name: Extract artifact
+        shell: pwsh
+        run: |
+          $zip = Join-Path $env:GITHUB_WORKSPACE 'dist\listenmoe-windows.zip'
+          if (-not (Test-Path $zip)) { throw "ZIP not found: $zip" }
+
+          if (Test-Path bundle) { Remove-Item bundle -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path bundle | Out-Null
+          Expand-Archive -Path $zip -DestinationPath bundle -Force
+
+          Write-Host "Extracted files:"
+          Get-ChildItem bundle | Sort-Object Name | Format-Table Name, Length
+
+      - name: Filter
+        shell: pwsh
+        run: |
+          $exe = Join-Path $env:GITHUB_WORKSPACE 'bundle\listenmoe.exe'
+          if (-not (Test-Path $exe)) { throw "EXE not found in bundle: $exe" }
+
+          $ntldd = 'C:\tools\msys64\mingw64\bin\ntldd.exe'
+          if (-not (Test-Path $ntldd)) {
+            Write-Host "ntldd not present on this runner; skipping filtering."
+            exit 0
+          }
+
+          $raw = & $ntldd -R $exe 2>$null
+          $needed = $raw |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ -match '^[A-Za-z]:\\' -and $_.ToLower().EndsWith('.dll') } |
+            ForEach-Object { Split-Path $_ -Leaf } |
+            Sort-Object -Unique
+
+          $bundleDlls = Get-ChildItem bundle -Filter '*.dll' | Select-Object -ExpandProperty Name
+          $remove = $bundleDlls | Where-Object { $needed -notcontains $_ }
+
+          # Keep it conservative: only remove if ntldd says it's not needed
+          foreach ($name in $remove) {
+            Remove-Item (Join-Path bundle $name) -Force
+          }
+
+          Write-Host "After filtering:"
+          Get-ChildItem bundle | Sort-Object Name | Format-Table Name, Length
+
+      - name: Install WiX Toolset
+        run: choco install wixtoolset --no-progress -y
+
+      - name: Bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path wix\generated | Out-Null
+          heat dir "bundle" `
+            -cg AppFiles `
+            -dr INSTALLDIR `
+            -gg -g1 -srd -sreg -sfrag `
+            -var var.BundleDir `
+            -out "wix\generated\AppFiles.wxs"
+
+      - name: Build
+        shell: pwsh
+        run: |
+          $wix = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+          if (-not (Test-Path $wix)) { throw "WiX bin not found at $wix" }
+
+          $ver = "${{ github.ref_name }}".TrimStart("v")
+
+          & "$wix\candle.exe" `
+            -dBundleDir="$(Resolve-Path bundle)" `
+            -dProductVersion="$ver" `
+            -out wix\generated\ `
+            data\Product.wxi `
+            data\ListenMoe.wxs `
+            wix\generated\AppFiles.wxs
+
+          & "$wix\light.exe" `
+            -out listenmoe.msi `
+            wix\generated\ListenMoe.wixobj `
+            wix\generated\AppFiles.wixobj
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: listenmoe-windows-msi
+          path: listenmoe.msi
+
+  publish:
+    runs-on: windows-latest
+    needs: bundle
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: listenmoe-windows-msi
+          path: dist
+
       - name: Get latest tag
         run: |
           $latest_tag = git describe --tags $(git rev-list --tags --max-count=1)
@@ -102,5 +216,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.LATEST_TAG }}
-          files: listenmoe-windows.zip
+          files: dist/listenmoe.msi
           overwrite_files: true
