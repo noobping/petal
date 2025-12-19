@@ -182,13 +182,19 @@ jobs:
           Write-Host "Using candle: $candle"
           Write-Host "Using light : $light"
 
-          $ver = "${{ env.LATEST_TAG }}"
+          $ver = "${{ env.LATEST_TAG }}" -replace '^v',''
+
+          $parts = $ver.Split('.')
+          if ($parts.Count -eq 3) { $ver = "$ver.0" }
+          elseif ($parts.Count -eq 2) { $ver = "$ver.0.0" }
+          elseif ($parts.Count -eq 1) { $ver = "$ver.0.0.0" }
+
+          Write-Host "Using ProductVersion: $ver"
 
           & $candle `
             -dBundleDir="$(Resolve-Path bundle)" `
             -dProductVersion="$ver" `
             -out wix\generated\ `
-            data\Product.wxi `
             data\ListenMoe.wxs `
             wix\generated\AppFiles.wxs
 
