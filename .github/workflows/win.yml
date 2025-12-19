@@ -150,11 +150,21 @@ jobs:
       - name: Install WiX Toolset
         run: choco install wixtoolset --no-progress -y
 
+      - name: Debug WiX installation
+        shell: pwsh
+        run: |
+          choco list --local-only wixtoolset
+          Get-Command candle.exe, light.exe, heat.exe -ErrorAction SilentlyContinue | Format-List
+          Get-ChildItem "C:\ProgramData\chocolatey\lib" -Filter "wixtoolset*" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 50
+
       - name: Bundle
         shell: pwsh
         run: |
+          $heat = (Get-Command heat.exe -ErrorAction Stop).Source
+          Write-Host "Using heat: $heat"
+
           New-Item -ItemType Directory -Force -Path wix\generated | Out-Null
-          heat dir "bundle" `
+          & $heat dir "bundle" `
             -cg AppFiles `
             -dr INSTALLDIR `
             -gg -g1 -srd -sreg -sfrag `
@@ -164,12 +174,15 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          $wix = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
-          if (-not (Test-Path $wix)) { throw "WiX bin not found at $wix" }
+          $candle = (Get-Command candle.exe -ErrorAction Stop).Source
+          $light  = (Get-Command light.exe  -ErrorAction Stop).Source
+
+          Write-Host "Using candle: $candle"
+          Write-Host "Using light : $light"
 
           $ver = "${{ github.ref_name }}".TrimStart("v")
 
-          & "$wix\candle.exe" `
+          & $candle `
             -dBundleDir="$(Resolve-Path bundle)" `
             -dProductVersion="$ver" `
             -out wix\generated\ `
@@ -177,7 +190,7 @@ jobs:
             data\ListenMoe.wxs `
             wix\generated\AppFiles.wxs
 
-          & "$wix\light.exe" `
+          & $light `
             -out listenmoe.msi `
             wix\generated\ListenMoe.wixobj `
             wix\generated\AppFiles.wixobj
