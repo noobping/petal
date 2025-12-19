@@ -54,34 +54,34 @@ jobs:
       - name: Bundle
         shell: pwsh
         run: |
-         $workspace = $env:GITHUB_WORKSPACE
-         Write-Host "Workspace: $workspace"
-         $bundleDir = Join-Path $workspace 'bundle'
-         if (Test-Path $bundleDir) {
-          Remove-Item $bundleDir -Recurse -Force
-         }
-         New-Item -ItemType Directory -Path $bundleDir | Out-Null
-         $exe = Join-Path $workspace 'target\x86_64-pc-windows-gnu\release\listenmoe.exe'
-         if (-not (Test-Path $exe)) {
-          Write-Error "EXE not found at: $exe"
-         }
-         Write-Host "Copying exe: $exe"
-         Copy-Item $exe $bundleDir -Force
-         $mingwBin = 'C:\tools\msys64\mingw64\bin'
-         if (-not (Test-Path $mingwBin)) {
-          Write-Error "MinGW bin dir not found: $mingwBin"
-         }
-         Write-Host "Copying DLLs from: $mingwBin"
-         Get-ChildItem -Path $mingwBin -Filter '*.dll' |
-         Copy-Item -Destination $bundleDir -Force
-         Write-Host "Bundle contents:"
-         Get-ChildItem $bundleDir
-         $zip = Join-Path $workspace 'listenmoe-windows.zip'
-         if (Test-Path $zip) {
-          Remove-Item $zip -Force
-         }
-         $src = Join-Path $bundleDir '*'
-         Compress-Archive -Path $src -DestinationPath $zip -Force
+          $workspace = $env:GITHUB_WORKSPACE
+          Write-Host "Workspace: $workspace"
+          $bundleDir = Join-Path $workspace 'bundle'
+          if (Test-Path $bundleDir) {
+           Remove-Item $bundleDir -Recurse -Force
+          }
+          New-Item -ItemType Directory -Path $bundleDir | Out-Null
+          $exe = Join-Path $workspace 'target\x86_64-pc-windows-gnu\release\listenmoe.exe'
+          if (-not (Test-Path $exe)) {
+           Write-Error "EXE not found at: $exe"
+          }
+          Write-Host "Copying exe: $exe"
+          Copy-Item $exe $bundleDir -Force
+          $mingwBin = 'C:\tools\msys64\mingw64\bin'
+          if (-not (Test-Path $mingwBin)) {
+           Write-Error "MinGW bin dir not found: $mingwBin"
+          }
+          Write-Host "Copying DLLs from: $mingwBin"
+          Get-ChildItem -Path $mingwBin -Filter '*.dll' |
+          Copy-Item -Destination $bundleDir -Force
+          Write-Host "Bundle contents:"
+          Get-ChildItem $bundleDir
+          $zip = Join-Path $workspace 'listenmoe-windows.zip'
+          if (Test-Path $zip) {
+           Remove-Item $zip -Force
+          }
+          $src = Join-Path $bundleDir '*'
+          Compress-Archive -Path $src -DestinationPath $zip -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -119,6 +119,14 @@ jobs:
 
           Write-Host "Extracted files:"
           Get-ChildItem bundle | Sort-Object Name | Format-Table Name, Length
+
+      - name: Install filter tool
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-ntldd-git
 
       - name: Filter
         shell: pwsh
