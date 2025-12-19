@@ -134,7 +134,7 @@ jobs:
           $exe = Join-Path $env:GITHUB_WORKSPACE 'bundle\listenmoe.exe'
           if (-not (Test-Path $exe)) { throw "EXE not found in bundle: $exe" }
 
-          $ntldd = 'C:\tools\msys64\mingw64\bin\ntldd.exe'
+          $ntldd = 'C:\msys64\mingw64\bin\ntldd.exe'
           if (-not (Test-Path $ntldd)) {
             Write-Host "ntldd not present on this runner; skipping filtering."
             exit 0
