@@ -2,6 +2,33 @@
 <component type="desktop-application">
   <id>io.github.noobping.listenmoe</id>
   <name>LISTEN.moe (Unofficial)</name>
+  <name xml:lang="bg">LISTEN.moe (Неофициално)</name>
+  <name xml:lang="cs">LISTEN.moe (Neoficiální)</name>
+  <name xml:lang="da">LISTEN.moe (Uofficiel)</name>
+  <name xml:lang="de">LISTEN.moe (Inoffiziell)</name>
+  <name xml:lang="el">LISTEN.moe (Ανεπίσημο)</name>
+  <name xml:lang="es">LISTEN.moe (No oficial)</name>
+  <name xml:lang="et">LISTEN.moe (Mitteametlik)</name>
+  <name xml:lang="fi">LISTEN.moe (Epävirallinen)</name>
+  <name xml:lang="fr">LISTEN.moe (Non officiel)</name>
+  <name xml:lang="hr">LISTEN.moe (Neslužbeno)</name>
+  <name xml:lang="hu">LISTEN.moe (Nem hivatalos)</name>
+  <name xml:lang="id">LISTEN.moe (Tidak Resmi)</name>
+  <name xml:lang="it">LISTEN.moe (Non ufficiale)</name>
+  <name xml:lang="ja">LISTEN.moe（非公式）</name>
+  <name xml:lang="ko">LISTEN.moe (비공식)</name>
+  <name xml:lang="lt">LISTEN.moe (Neoficialus)</name>
+  <name xml:lang="lv">LISTEN.moe (Neoficiāls)</name>
+  <name xml:lang="nl">LISTEN.moe (Onofficieel)</name>
+  <name xml:lang="pl">LISTEN.moe (Nieoficjalne)</name>
+  <name xml:lang="pt">LISTEN.moe (Não oficial)</name>
+  <name xml:lang="ro">LISTEN.moe (Neoficial)</name>
+  <name xml:lang="sk">LISTEN.moe (Neoficiálne)</name>
+  <name xml:lang="sl">LISTEN.moe (Neuradno)</name>
+  <name xml:lang="sv">LISTEN.moe (Inofficiell)</name>
+  <name xml:lang="tr">LISTEN.moe (Resmi olmayan)</name>
+  <name xml:lang="zh-CN">LISTEN.moe（非官方）</name>
+
   <summary>The world's cutest radio. Powered by LISTEN.moe!</summary>
   <summary xml:lang="bg">Най-сладкото радио в света. Захранвано от LISTEN.moe!</summary>
   <summary xml:lang="cs">Nejroztomilejší rádio na světě. Poháněno LISTEN.moe!</summary>
@@ -30,7 +57,6 @@
   <summary xml:lang="sv">Världens sötaste radio. Drivs av LISTEN.moe!</summary>
   <summary xml:lang="tr">Dünyanın en sevimli radyosu. LISTEN.moe tarafından desteklenmektedir!</summary>
   <summary xml:lang="zh-CN">世界上最可爱的电台，由 LISTEN.moe 提供！</summary>
-  <summary xml:lang="zh-TW">世界上最可愛的電台，由 LISTEN.moe 提供！</summary>
 
   <developer_name>noobping</developer_name>
 
