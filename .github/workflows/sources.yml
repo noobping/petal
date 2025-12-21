@@ -30,7 +30,7 @@ jobs:
       - name: Install Python dependencies for cargo generator
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install aiohttp
+          python3 -m pip install aiohttp tomlkit
 
       - name: Ensure Cargo.lock exists
         run: |
