@@ -17,18 +17,6 @@ flatpak remote-add --if-not-exists flatpaks https://noobping.github.io/flatpaks/
 flatpak install flatpaks io.github.noobping.listenmoe
 ```
 
-## AppImage
-
-This application is an internet radio client. It streams music from the internet, so it needs network access.
-If you run this app inside **firejail**, make sure the firejail profile allows network access. Otherwise it won’t be able to stream any audio.
-To install the provided firejail profile:
-
-```sh
-mkdir -p ~/.config/firejail
-cp /path/to/extracted/usr/share/firejail/listenmoe.profile ~/.config/firejail/
-firejail listenmoe
-```
-
 ## Translations
 
 The `po/` folder contains translation files in `.po` (Portable Object) format. If you find a typo, unclear wording, or can improve a translation, you are welcome to contribute.
