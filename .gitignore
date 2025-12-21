@@ -1,6 +1,7 @@
 debug
 target
 AppDir
+vendor/
 *cache
 *.lock
 *.AppImage
