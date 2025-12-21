@@ -81,6 +81,12 @@ jobs:
           echo "----- cargo-sources.yml tail -----"
           tail -n 80 cargo-sources.yml || true
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-sources
+          path: cargo-sources.yml
+
       - name: Commit and push if changed
         shell: bash
         run: |
