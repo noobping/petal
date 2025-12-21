@@ -110,7 +110,9 @@ jobs:
 
   bundle:
     runs-on: windows-latest
-    needs: build
+    needs:
+      - build
+      - locales
     permissions:
       contents: write
 
