@@ -12,3 +12,4 @@ vendor/
 **/*.rs.bk
 *.pdb
 **/mutants.out*/
+.flatpak
