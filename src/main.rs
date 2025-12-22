@@ -6,7 +6,6 @@ mod locale;
 #[cfg(debug_assertions)]
 mod log;
 mod meta;
-mod metainfo;
 mod station;
 mod ui;
 

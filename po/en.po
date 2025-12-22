@@ -1,49 +1,49 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: io.github.noobping.listenmoe 1.0.0\n"
-"Language: nl\n"
+"Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Listen.moe Radio"
-msgstr "Listen.moe-radio"
+msgstr "Listen.moe Radio"
 
 msgid "JPOP/KPOP Radio"
-msgstr "JPOP/KPOP-radio"
+msgstr "JPOP/KPOP Radio"
 
 msgid "Copy title & artist"
-msgstr "Titel en artiest kopiëren"
+msgstr "Copy title & artist"
 
 msgid "Play %s"
-msgstr "Speel %s"
+msgstr "Play %s"
 
 msgid "About"
-msgstr "Over"
+msgstr "About"
 
 msgid "Quit"
-msgstr "Afsluiten"
+msgstr "Quit"
 
 msgid "Install"
-msgstr "Installeren"
+msgstr "Install"
 
 msgid "Uninstall"
-msgstr "Verwijderen"
+msgstr "Uninstall"
 
 msgid "A cute radio App. Powered by LISTEN.moe!"
-msgstr ""
+msgstr "A cute radio App. Powered by LISTEN.moe!"
 
 msgid "This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe."
-msgstr ""
+msgstr "This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe."
 
 msgid "Listen to J-POP/K-POP"
-msgstr ""
+msgstr "Listen to J-POP/K-POP"
 
 msgid "Pause and resume the live stream"
-msgstr ""
+msgstr "Pause and resume the live stream"
 
 msgid "Initial release."
-msgstr ""
+msgstr "Initial release."
 
 msgid "AI translation (GPT-5.2); reviewed by nobody"
-msgstr "AI-vertaling (GPT-5.2); Gecontroleerd door Nick"
+msgstr "AI translation (GPT-5.2); reviewed by Nick"

@@ -6,34 +6,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/ui.rs:84
 msgid "Listen.moe Radio"
 msgstr "Listen.moe ラジオ"
 
-#: src/ui.rs:147
 msgid "JPOP/KPOP Radio"
 msgstr "JPOP/KPOP ラジオ"
 
-#: src/ui.rs:217
 msgid "Copy title & artist"
 msgstr "タイトルとアーティストをコピー"
 
-#: src/ui.rs:282
 msgid "Play %s"
 msgstr "%s を再生"
 
-#: src/ui.rs:286
 msgid "About"
 msgstr "情報"
 
-#: src/ui.rs:293
 msgid "Quit"
 msgstr "終了"
 
-#: src/ui.rs:307
 msgid "Install"
 msgstr "インストール"
 
-#: src/ui.rs:307
 msgid "Uninstall"
 msgstr "アンインストール"
+
+msgid "A cute radio App. Powered by LISTEN.moe!"
+msgstr "かわいいラジオアプリ。LISTEN.moe 提供！"
+
+msgid "This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe."
+msgstr "これは LISTEN.moe の非公式アプリです。配信およびメタデータは LISTEN.moe によって提供されています。"
+
+msgid "Listen to J-POP/K-POP"
+msgstr "J-POP／K-POP を聴く"
+
+msgid "Pause and resume the live stream"
+msgstr "ライブ配信の一時停止・再開"
+
+msgid "Initial release."
+msgstr "初回リリース。"
+
+msgid "AI translation (GPT-5.2); reviewed by nobody"
+msgstr "AI翻訳（GPT-5.2）；Kanaによるレビュー済み"

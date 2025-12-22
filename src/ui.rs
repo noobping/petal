@@ -1,6 +1,5 @@
 use crate::listen::Listen;
 use crate::meta::{Meta, TrackInfo};
-use crate::metainfo::metainfo_description;
 use crate::station::Station;
 
 use adw::glib;
@@ -202,13 +201,13 @@ pub fn build_ui(app: &Application) {
             let authors: Vec<_> = env!("CARGO_PKG_AUTHORS").split(':').collect();
             let homepage = option_env!("CARGO_PKG_HOMEPAGE").unwrap_or("");
             let issues = format!("{}/issues", env!("CARGO_PKG_REPOSITORY"));
-            let comments = metainfo_description().unwrap_or_else(|| gettext(env!("CARGO_PKG_DESCRIPTION")));
+            let comments = gettext("This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe.");
             let about = adw::AboutDialog::builder()
                 .application_name("LISTEN.moe")
                 .application_icon(APP_ID)
                 .version(env!("CARGO_PKG_VERSION"))
                 .developers(&authors[..])
-                .translator_credits("AI translation (GPT-5.2); reviewed by Nick and Kana")
+                .translator_credits(gettext("AI translation (GPT-5.2); reviewed by nobody"))
                 .website(homepage)
                 .issue_url(issues)
                 .support_url(format!("{}discord", homepage))

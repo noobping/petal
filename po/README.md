@@ -1,7 +1,7 @@
 
 # Translations
 
-This folder contains translation files in `.po` (Portable Object) format. Other translations (such as the app description) are located in the [metainfo file](../data/io.github.noobping.listenmoe.metainfo.xml). If you spot a typo, unclear wording, or have a better translation, contributions are welcome.
+This folder contains translation files in `.po` (Portable Object) format. If you spot a typo, unclear wording, or have a better translation, contributions are welcome.
 
 ## What to edit
 
@@ -28,4 +28,4 @@ If you do not want to edit files on GitHub, you can open an [issue](https://gith
 
 ## Guidelines
 
-Keep the meaning of the original text the same. Do not add or remove information unless necessary for the language. Placeholders such as `%s`, `{name}`, or `%(count)d` must remain exactly the same. They may be moved if required by grammar, but must not be changed or removed. Do not edit `msgid`, `comments`, or `file headers`. Only modify the `msgstr` values.
+Keep the meaning of the original text the same. Do not add or remove information unless necessary for the language. Placeholders such as `%s`, `{name}`, or `%(count)d` must remain exactly the same. They may be moved if required by grammar, but must not be changed or removed. Do not edit `msgid`, comments, or file headers. Only modify the `msgstr` values. **Exception:** These rules do not apply to the translation notes (e.g. AI translation or review annotations).
