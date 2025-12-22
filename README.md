@@ -11,7 +11,7 @@ Listen to J-POP and K-POP, or pause and resume the live stream.
 
 ## Translations
 
-The `po` folder contains translation files in `.po` (Portable Object) format. Other translations (such as the app description) are located in the [metainfo file](data/io.github.noobping.listenmoe.metainfo.xml). If you spot a typo, unclear wording, or have a better translation, contributions are welcome.
+The `po` folder contains translation files in `.po` (Portable Object) format. If you spot a typo, unclear wording, or have a better translation, contributions are welcome.
 
 ## Build
 
