@@ -21,7 +21,10 @@ msgstr ""
 msgid "This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe."
 msgstr ""
 
-msgid "Listen to J-POP/K-POP"
+msgid "J-POP and K-POP radio"
+msgstr ""
+
+msgid "Listen to J-POP and K-POP"
 msgstr ""
 
 msgid "Pause and resume the live stream"

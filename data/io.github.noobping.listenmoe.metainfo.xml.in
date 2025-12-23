@@ -2,13 +2,13 @@
 <component type="desktop-application">
   <id>io.github.noobping.listenmoe</id>
   <name>ListenMoe</name>
-  <summary>Listen to J-POP/K-POP</summary>
+  <summary>J-POP and K-POP radio</summary>
   <description>
     <p>
       This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe.
     </p>
     <ul>
-      <li>Listen to J-POP/K-POP</li>
+      <li>Listen to J-POP and K-POP</li>
       <li>Pause and resume the live stream</li>
     </ul>
   </description>
@@ -86,7 +86,7 @@
           Initial release.
         </p>
         <ul>
-          <li>Listen to J-POP/K-POP</li>
+          <li>Listen to J-POP and K-POP</li>
           <li>Pause and resume the live stream</li>
         </ul>
       </description>

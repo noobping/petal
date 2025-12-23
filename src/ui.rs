@@ -52,7 +52,7 @@ pub fn build_ui(app: &Application) {
     let (tx, rx) = mpsc::channel::<TrackInfo>();
     let meta = Meta::new(station, tx, radio.lag_ms());
     let (cover_tx, cover_rx) = mpsc::channel::<Result<Vec<u8>, String>>();
-    let win_title = WindowTitle::new("ListenMoe", &gettext("Listen to J-POP/K-POP"));
+    let win_title = WindowTitle::new("ListenMoe", &gettext("J-POP and K-POP radio"));
 
     let play_button = Button::from_icon_name("media-playback-start-symbolic");
     play_button.set_action_name(Some("win.play"));
@@ -138,7 +138,7 @@ pub fn build_ui(app: &Application) {
             pause.set_visible(false);
             play.set_visible(true);
             win.set_title("ListenMoe");
-            win.set_subtitle(&gettext("Listen to J-POP/K-POP"));
+            win.set_subtitle(&gettext("J-POP and K-POP radio"));
             #[cfg(all(target_os = "linux", feature = "controls"))]
             let _ = controls
                 .borrow_mut()
@@ -159,7 +159,7 @@ pub fn build_ui(app: &Application) {
             stop.set_visible(false);
             play.set_visible(true);
             win.set_title("ListenMoe");
-            win.set_subtitle(&gettext("Listen to J-POP/K-POP"));
+            win.set_subtitle(&gettext("J-POP and K-POP radio"));
             #[cfg(all(target_os = "linux", feature = "controls"))]
             let _ = controls
                 .borrow_mut()

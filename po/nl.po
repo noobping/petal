@@ -21,8 +21,11 @@ msgstr "Afsluiten"
 msgid "This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe."
 msgstr "Dit is een niet-officiële app voor LISTEN.moe. Streaming en metadata worden geleverd door LISTEN.moe."
 
-msgid "Listen to J-POP/K-POP"
-msgstr "Luister naar J-POP/K-POP"
+msgid "J-POP and K-POP radio"
+msgstr "J-POP- en K-POP-radio"
+
+msgid "Listen to J-POP and K-POP"
+msgstr "Luister naar J-POP en K-POP"
 
 msgid "Pause and resume the live stream"
 msgstr "Pauzeer en hervat de livestream."
