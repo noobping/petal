@@ -3,11 +3,16 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![Windows Build](https://github.com/noobping/listenmoe/actions/workflows/win.yml/badge.svg)](https://github.com/noobping/listenmoe/actions/workflows/win.yml)
 [![Linux Build](https://github.com/noobping/listenmoe/actions/workflows/linux.yml/badge.svg)](https://github.com/noobping/listenmoe/actions/workflows/linux.yml)
+[![Flathub version](https://img.shields.io/flathub/v/io.github.noobping.listenmoe)](https://flathub.org/apps/details/io.github.noobping.listenmoe)
 
 This is a Unofficial App for LISTEN.moe. Stream and metadata provided by [LISTEN.moe](https://listen.moe).
 Listen to J-POP and K-POP, or pause and resume the live stream.
 
 ![screenshot](data/io.github.noobping.listenmoe.screenshot.png)
+
+<a href="https://flathub.org/apps/details/io.github.noobping.listenmoe">
+  <img alt="Get it on Flathub" src="https://flathub.org/api/badge?locale=en"/>
+</a>
 
 ## Translations
 
