@@ -47,3 +47,12 @@ msgstr "Initial release."
 
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "AI translation (GPT-5.2); reviewed by Nick"
+
+msgid "This release focuses on visuals and localization."
+msgstr "This release focuses on visuals and localization."
+
+msgid "Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones."
+msgstr "Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones."
+
+msgid "Polished translations and improved how they are applied."
+msgstr "Polished translations and improved how they are applied."

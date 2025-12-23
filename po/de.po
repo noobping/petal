@@ -47,3 +47,12 @@ msgstr "Erstveröffentlichung."
 
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "KI-Übersetzung (GPT-5.2); geprüft von Eric"
+
+msgid "This release focuses on visuals and localization."
+msgstr "Diese Version konzentriert sich auf visuelle Verbesserungen und Lokalisierung."
+
+msgid "Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones."
+msgstr "Die Erkennung des Hell-/Dunkelmodus wurde optimiert, sodass helle Farben nicht mehr fälschlicherweise als dunkel erkannt werden."
+
+msgid "Polished translations and improved how they are applied."
+msgstr "Übersetzungen wurden verbessert und konsistenter angewendet."

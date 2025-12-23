@@ -64,14 +64,14 @@
   </provides>
 
   <releases>
-    <release version="1.0.1" date="2025-23-29">
+    <release version="1.0.1" date="2025-12-29">
       <description>
         <p>
-          This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe.
+          This release focuses on visuals and localization.
         </p>
         <ul>
-          <li>Listen to J-POP/K-POP</li>
-          <li>Pause and resume the live stream</li>
+          <li>Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones.</li>
+          <li>Polished translations and improved how they are applied.</li>
         </ul>
       </description>
     </release>

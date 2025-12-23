@@ -47,3 +47,12 @@ msgstr "Lanzamiento inicial."
 
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "Traducción por IA (GPT-5.2); revisada Kana"
+
+msgid "This release focuses on visuals and localization."
+msgstr "Esta versión se centra en mejoras visuales y localización."
+
+msgid "Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones."
+msgstr "Se ajustó la detección del modo claro/oscuro para que los colores claros ya no se confundan con oscuros."
+
+msgid "Polished translations and improved how they are applied."
+msgstr "Se mejoraron las traducciones y la forma en que se aplican."

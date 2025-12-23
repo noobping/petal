@@ -45,5 +45,15 @@ msgstr ""
 msgid "Initial release."
 msgstr ""
 
+# You may change this with your name
 msgid "AI translation (GPT-5.2); reviewed by nobody"
+msgstr ""
+
+msgid "This release focuses on visuals and localization."
+msgstr ""
+
+msgid "Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones."
+msgstr ""
+
+msgid "Polished translations and improved how they are applied."
 msgstr ""
