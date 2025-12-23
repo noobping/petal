@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>io.github.noobping.listenmoe</id>
-  <name>LISTEN.moe</name>
+  <name>Listen.moe</name>
   <summary>A cute little radio app. Powered by LISTEN.moe!</summary>
   <description>
     <p>
