@@ -81,7 +81,7 @@
   </provides>
 
   <releases>
-    <release version="1.0.2" date="2026-01-26">
+    <release version="1.0.2" date="2025-12-24">
       <description>
         <p>
           Removed gaps between sound bars.
