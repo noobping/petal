@@ -51,3 +51,6 @@ msgstr ""
 
 msgid "Polished translations and improved how they are applied."
 msgstr ""
+
+msgid "Removed gaps between sound bars."
+msgstr ""

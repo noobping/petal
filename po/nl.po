@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.1\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.2\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -50,3 +50,6 @@ msgstr "De detectie van de donkere/lichtmodus is verfijnd, zodat lichte kleuren 
 
 msgid "Polished translations and improved how they are applied."
 msgstr "Vertalingen zijn verbeterd."
+
+msgid "Removed gaps between sound bars."
+msgstr "Ruimte tussen geluidsbalken verwijderd."

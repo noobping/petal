@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.1\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.2\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -50,3 +50,6 @@ msgstr "ダーク／ライトモードの判定を微調整し、明るい色が
 
 msgid "Polished translations and improved how they are applied."
 msgstr "翻訳を改善し、適用方法を最適化しました。"
+
+msgid "Removed gaps between sound bars."
+msgstr "サウンドバー間の隙間を削除"
