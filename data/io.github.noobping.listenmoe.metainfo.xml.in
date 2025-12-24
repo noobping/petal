@@ -29,7 +29,7 @@
   <url type="vcs-browser">https://github.com/noobping/listenmoe</url>
 
   <branding>
-    <color type="primary" scheme_preference="light">#ffccdd</color>
+    <color type="primary" scheme_preference="light">#99c1f1</color>
     <color type="primary" scheme_preference="dark">#ff015b</color>
   </branding>
 
@@ -62,7 +62,17 @@
     <screenshot type="default" xml:lang="en">
       <image>
         https://raw.githubusercontent.com/noobping/listenmoe/main/data/io.github.noobping.listenmoe.screenshot.png</image>
-      <caption>Main window when connected</caption>
+      <caption>Window when connected</caption>
+    </screenshot>
+    <screenshot type="default" xml:lang="en">
+      <image>
+        https://raw.githubusercontent.com/noobping/listenmoe/main/data/io.github.noobping.listenmoe.light.png</image>
+      <caption>Light window when disconnected</caption>
+    </screenshot>
+    <screenshot type="default" xml:lang="en">
+      <image>
+        https://raw.githubusercontent.com/noobping/listenmoe/main/data/io.github.noobping.listenmoe.dark.png</image>
+      <caption>Dark window when disconnected</caption>
     </screenshot>
   </screenshots>
 
