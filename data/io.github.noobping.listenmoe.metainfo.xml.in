@@ -13,7 +13,6 @@
       <li>Animated sound bars that react to the music</li>
       <li>Dynamic colors based on the current album or artist cover</li>
       <li>No ads</li>
-      <li>Written in Rust</li>
     </ul>
   </description>
 
