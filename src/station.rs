@@ -12,6 +12,13 @@ impl Station {
         }
     }
 
+    pub fn stream_fallback_url(self) -> &'static str {
+        match self {
+            Station::Jpop => "https://listen.moe/fallback",
+            Station::Kpop => "https://listen.moe/kpop/fallback",
+        }
+    }
+
     pub fn ws_url(self) -> &'static str {
         match self {
             Station::Jpop => "wss://listen.moe/gateway_v2",

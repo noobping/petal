@@ -60,3 +60,6 @@ msgstr ""
 
 msgid "Removed gaps between sound bars."
 msgstr ""
+
+msgid "Streaming logic now better handles connection issues and stream changes."
+msgstr ""
