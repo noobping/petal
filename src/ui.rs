@@ -52,7 +52,7 @@ pub fn build_ui(app: &Application) {
     let (tx, rx) = mpsc::channel::<TrackInfo>();
     let meta = Meta::new(station, tx, radio.lag_ms());
     let (cover_tx, cover_rx) = mpsc::channel::<Result<Vec<u8>, String>>();
-    let win_title = WindowTitle::new("ListenMoe", &gettext("J-POP and K-POP radio"));
+    let win_title = WindowTitle::new("Listen Moe", &gettext("J-POP and K-POP radio"));
 
     let play_button = Button::from_icon_name("media-playback-start-symbolic");
     play_button.set_action_name(Some("win.play"));
@@ -63,7 +63,7 @@ pub fn build_ui(app: &Application) {
     let height = 50;
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("ListenMoe")
+        .title("Listen Moe")
         .icon_name(APP_ID)
         .default_width(300)
         .default_height(height)
@@ -77,7 +77,7 @@ pub fn build_ui(app: &Application) {
 
     #[cfg(all(target_os = "linux", feature = "controls"))]
     let platform_config = PlatformConfig {
-        display_name: "ListenMoe",
+        display_name: "Listen Moe",
         dbus_name: APP_ID,
         #[cfg(target_os = "windows")]
         hwnd: window
@@ -112,7 +112,7 @@ pub fn build_ui(app: &Application) {
         #[cfg(all(target_os = "linux", feature = "controls"))]
         let controls = controls.clone();
         make_action("play", move || {
-            win.set_title("ListenMoe");
+            win.set_title("Listen Moe");
             win.set_subtitle("Connecting...");
             meta.start();
             radio.start();
@@ -137,7 +137,7 @@ pub fn build_ui(app: &Application) {
             radio.pause();
             pause.set_visible(false);
             play.set_visible(true);
-            win.set_title("ListenMoe");
+            win.set_title("Listen Moe");
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
             #[cfg(all(target_os = "linux", feature = "controls"))]
             let _ = controls
@@ -158,7 +158,7 @@ pub fn build_ui(app: &Application) {
             radio.stop();
             stop.set_visible(false);
             play.set_visible(true);
-            win.set_title("ListenMoe");
+            win.set_title("Listen Moe");
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
             #[cfg(all(target_os = "linux", feature = "controls"))]
             let _ = controls
@@ -178,7 +178,7 @@ pub fn build_ui(app: &Application) {
             let issues = format!("{}/issues", env!("CARGO_PKG_REPOSITORY"));
             let comments = gettext("This is an unofficial app for LISTEN.moe. Stream and metadata provided by LISTEN.moe.");
             let about = adw::AboutDialog::builder()
-                .application_name("ListenMoe")
+                .application_name("Listen Moe")
                 .application_icon(APP_ID)
                 .version(env!("CARGO_PKG_VERSION"))
                 .developers(&authors[..])
@@ -433,7 +433,7 @@ pub fn build_ui(app: &Application) {
                     let _ = controls.set_metadata(MediaMetadata {
                         title: Some(&info.title),
                         artist: Some(&info.artist),
-                        album: Some("ListenMoe"),
+                        album: Some("Listen Moe"),
                         cover_url: cover, // becomes None if no cover
                         ..Default::default()
                     });
