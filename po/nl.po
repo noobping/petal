@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.3\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.4\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,3 +62,6 @@ msgstr "Ruimte tussen geluidsbalken verwijderd."
 
 msgid "Streaming logic now better handles connection issues and stream changes."
 msgstr "Streaminglogica kan nu beter omgaan met verbindingsproblemen en streamwijzigingen."
+
+msgid "Clarified the application description to avoid confusion."
+msgstr "De applicatiebeschrijving verduidelijkt."

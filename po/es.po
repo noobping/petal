@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.3\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.4\n"
 "Language: es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,3 +62,6 @@ msgstr "Se eliminaron los espacios entre las barras de sonido."
 
 msgid "Streaming logic now better handles connection issues and stream changes."
 msgstr "La lógica de transmisión ahora gestiona mejor los problemas de conexión y los cambios de transmisión."
+
+msgid "Clarified the application description."
+msgstr "Se aclaró la descripción de la aplicación."

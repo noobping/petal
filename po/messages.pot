@@ -63,3 +63,6 @@ msgstr ""
 
 msgid "Streaming logic now better handles connection issues and stream changes."
 msgstr ""
+
+msgid "Clarified the application description."
+msgstr ""
