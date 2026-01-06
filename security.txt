@@ -1,0 +1,22 @@
+Contact: https://github.com/noobping/listenmoe/issues
+Policy: https://github.com/noobping/listenmoe/SECURITY.md
+Preferred-Languages: en
+Canonical: https://raw.githubusercontent.com/noobping/listenmoe/main/security.txt
+
+Scope:
+This repository contains a Rust client for listen.moe.
+The listen.moe radio service, servers, and backend infrastructure
+are NOT operated or maintained by this project.
+
+Out-of-Scope:
+- Issues affecting the listen.moe radio service itself
+- Backend, streaming infrastructure, or server-side components
+- User data, authentication, or secrets (none are handled)
+
+Disclosure:
+Security issues are handled publicly.
+Please open a GitHub issue or pull request.
+
+Acknowledgments:
+Valid reports and contributions are appreciated, but no formal
+response timeline or rewards are provided.
