@@ -80,3 +80,6 @@ msgstr "画像キャプションを翻訳"
 
 msgid "Updated screenshots to use a more reasonable window size"
 msgstr "より適切なウィンドウサイズを使用するようスクリーンショットを更新"
+
+msgid "Updated application icon"
+msgstr "アプリケーションアイコンを更新"

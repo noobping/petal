@@ -81,3 +81,6 @@ msgstr ""
 
 msgid "Updated screenshots to use a more reasonable window size"
 msgstr ""
+
+msgid "Updated application icon"
+msgstr ""

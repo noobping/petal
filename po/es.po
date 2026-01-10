@@ -80,3 +80,6 @@ msgstr "Subtítulos de imágenes traducidos"
 
 msgid "Updated screenshots to use a more reasonable window size"
 msgstr "Capturas de pantalla actualizadas para usar un tamaño de ventana más razonable"
+
+msgid "Updated application icon"
+msgstr "Icono de la aplicación actualizado"

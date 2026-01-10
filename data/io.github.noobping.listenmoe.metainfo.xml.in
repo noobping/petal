@@ -85,10 +85,11 @@
   </provides>
 
   <releases>
-    <release version="1.0.5" date="2026-01-17">
+    <release version="1.0.5" date="2026-01-10">
       <description>
         <li>Translated image captions</li>
         <li>Updated screenshots to use a more reasonable window size</li>
+        <li>Updated application icon</li>
       </description>
     </release>
     <release version="1.0.4" date="2026-01-06">

@@ -80,3 +80,6 @@ msgstr "Afbeeldingsbijschriften vertaald"
 
 msgid "Updated screenshots to use a more reasonable window size"
 msgstr "Screenshots bijgewerkt"
+
+msgid "Updated application icon"
+msgstr "Applicatie-icoon bijgewerkt"
