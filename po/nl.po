@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.4\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.5\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,6 +45,12 @@ msgstr "Gemaakt met Rust"
 msgid "Initial release."
 msgstr "Eerste versie"
 
+msgid "When connected and there is no album or artist image"
+msgstr "Verbonden wanneer er geen album- of artiestafbeelding is"
+
+msgid "Colored window when connected"
+msgstr "Gekleurd venster wanneer verbonden"
+
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "AI-vertaling (GPT-5.2); Gecontroleerd door Nick"
 
@@ -65,3 +71,9 @@ msgstr "Streaminglogica kan nu beter omgaan met verbindingsproblemen en streamwi
 
 msgid "Clarified the application description to avoid confusion."
 msgstr "De applicatiebeschrijving verduidelijkt."
+
+msgid "Translated image captions"
+msgstr "Afbeeldingsbijschriften vertaald"
+
+msgid "Updated screenshots to use a more reasonable window size"
+msgstr "Screenshots bijgewerkt"

@@ -46,8 +46,11 @@
   </categories>
 
   <keywords>
+    <keyword>Audio</keyword>
     <keyword>J-POP</keyword>
     <keyword>K-POP</keyword>
+    <keyword>Listen</keyword>
+    <keyword>Music</keyword>
     <keyword>Radio</keyword>
   </keywords>
 
@@ -77,6 +80,12 @@
   </provides>
 
   <releases>
+    <release version="1.0.5" date="2026-01-17">
+      <description>
+        <li>Translated image captions</li>
+        <li>Updated screenshots to use a more reasonable window size</li>
+      </description>
+    </release>
     <release version="1.0.4" date="2026-01-06">
       <description>
         <p>

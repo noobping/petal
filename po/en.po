@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.4\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.5\n"
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,6 +45,12 @@ msgstr "Made with Rust"
 msgid "Initial release."
 msgstr "Initial release."
 
+msgid "When connected and there is no album or artist image"
+msgstr "When connected and there is no album or artist image"
+
+msgid "Colored window when connected"
+msgstr "Colored window when connected"
+
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "AI translation (GPT-5.2); reviewed by Nick"
 
@@ -65,3 +71,9 @@ msgstr "Streaming logic now better handles connection issues and stream changes.
 
 msgid "Clarified the application description."
 msgstr "Clarified the application description."
+
+msgid "Translated image captions"
+msgstr "Translated image captions"
+
+msgid "Updated screenshots to use a more reasonable window size"
+msgstr "Updated screenshots to use a more reasonable window size"

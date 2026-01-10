@@ -4,8 +4,8 @@ Type=Application
 
 Name=Listen Moe
 Comment=J-POP and K-POP radio
-Categories=AudioVideo;Player;
-
+Categories=AudioVideo;Audio;Music;Player;
+Keywords=Radio;Audio;Listen;J-POP;K-POP;
 Icon=io.github.noobping.listenmoe
 Exec=listenmoe
 Terminal=false

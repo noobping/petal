@@ -79,12 +79,6 @@ pub fn build_ui(app: &Application) {
     let platform_config = PlatformConfig {
         display_name: "Listen Moe",
         dbus_name: APP_ID,
-        #[cfg(target_os = "windows")]
-        hwnd: window
-            .surface()
-            .and_then(|s| s.downcast::<gdk4_win32::Win32Surface>().ok())
-            .map(|s| s.handle()),
-        #[cfg(not(target_os = "windows"))]
         hwnd: None,
     };
     #[cfg(all(target_os = "linux", feature = "controls"))]

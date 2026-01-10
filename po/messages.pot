@@ -45,6 +45,12 @@ msgstr ""
 msgid "Initial release."
 msgstr ""
 
+msgid "When connected and there is no album or artist image"
+msgstr ""
+
+msgid "Colored window when connected"
+msgstr ""
+
 # You may change this with your name
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr ""
@@ -65,4 +71,10 @@ msgid "Streaming logic now better handles connection issues and stream changes."
 msgstr ""
 
 msgid "Clarified the application description."
+msgstr ""
+
+msgid "Translated image captions"
+msgstr ""
+
+msgid "Updated screenshots to use a more reasonable window size"
 msgstr ""

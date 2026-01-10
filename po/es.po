@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.4\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.5\n"
 "Language: es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -45,6 +45,12 @@ msgstr "Hecho con Rust"
 msgid "Initial release."
 msgstr "Lanzamiento inicial."
 
+msgid "When connected and there is no album or artist image"
+msgstr "Conectado cuando no hay imagen del álbum o del artista"
+
+msgid "Colored window when connected"
+msgstr "Ventana con color cuando está conectado"
+
 msgid "AI translation (GPT-5.2); reviewed by nobody"
 msgstr "Traducción por IA (GPT-5.2); revisada Kana"
 
@@ -65,3 +71,9 @@ msgstr "La lógica de transmisión ahora gestiona mejor los problemas de conexi�
 
 msgid "Clarified the application description."
 msgstr "Se aclaró la descripción de la aplicación."
+
+msgid "Translated image captions"
+msgstr "Subtítulos de imágenes traducidos"
+
+msgid "Updated screenshots to use a more reasonable window size"
+msgstr "Capturas de pantalla actualizadas para usar un tamaño de ventana más razonable"

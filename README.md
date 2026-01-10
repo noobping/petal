@@ -13,10 +13,21 @@
        src="https://img.shields.io/badge/Get%20it%20on-Windows-blue" />
 </a>
 
-This is a Unofficial App for LISTEN.moe. Stream and metadata provided by [LISTEN.moe](https://listen.moe).
-Listen to J-POP and K-POP, or pause and resume the live stream.
+Listen to J-POP and K-POP, or pause and resume the live stream. Stream and metadata provided by [LISTEN.moe](https://listen.moe).
 
 ![screenshot](data/io.github.noobping.listenmoe.screenshot_green.png)
+
+## About
+
+[Listen Moe](https://github.com/noobping/listenmoe) is a small GNOME-native radio application for streaming music from [LISTEN.moe](https://listen.moe). It is built with Libadwaita.
+
+The application uses a compact, titlebar-style layout that displays the current album and artist, along with basic playback controls.
+
+When album or artist artwork is available, a dominant color is extracted and used to select the appropriate GNOME light or dark appearance. If no artwork is available, the default GNOME appearance is used.
+
+The background includes subtle, animated sound bars that respond to the music. Their color adapts to the extracted palette while remaining unobtrusive. Text readability is preserved using a soft overlay behind the title and subtitle.
+
+![demo](data/demo.gif)
 
 <a href="https://flathub.org/apps/details/io.github.noobping.listenmoe">
   <img alt="Get it on Flathub" src="https://flathub.org/api/badge?locale=en"/>
@@ -26,7 +37,9 @@ Listen to J-POP and K-POP, or pause and resume the live stream.
 
 The `po` folder contains translation files in `.po` (Portable Object) format. If you spot a typo, unclear wording, or have a better translation, contributions are welcome.
 
-## Build
+## Development
+
+### Build
 
 Build the flatpak App:
 
@@ -41,8 +54,20 @@ Or build a AppImage:
 appimage-builder --recipe .appimage-builder.yml
 ```
 
-## Run (debug)
+### Run (debug)
 
 ```sh
 cargo run
+```
+
+### Update
+
+Use `cargo-edit` to update the dependencies.
+
+```sh
+cargo install cargo-edit
+```
+
+```sh
+cargo upgrade --incompatible
 ```
