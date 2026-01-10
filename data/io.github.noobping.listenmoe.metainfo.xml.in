@@ -41,16 +41,15 @@
   </supports>
 
   <categories>
+    <category>AudioVideo</category>
     <category>Audio</category>
     <category>Music</category>
   </categories>
 
   <keywords>
-    <keyword>Audio</keyword>
+    <keyword>Music</keyword>
     <keyword>J-POP</keyword>
     <keyword>K-POP</keyword>
-    <keyword>Listen</keyword>
-    <keyword>Music</keyword>
     <keyword>Radio</keyword>
   </keywords>
 
@@ -80,6 +79,13 @@
   </provides>
 
   <releases>
+    <release version="1.0.7" date="2026-01-12">
+      <description>
+        <p>
+          Updated application icon
+        </p>
+      </description>
+    </release>
     <release version="1.0.6" date="2026-01-11">
       <description>
         <ul>
