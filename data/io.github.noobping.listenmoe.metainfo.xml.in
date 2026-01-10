@@ -87,9 +87,11 @@
   <releases>
     <release version="1.0.5" date="2026-01-10">
       <description>
-        <li>Translated image captions</li>
-        <li>Updated screenshots to use a more reasonable window size</li>
-        <li>Updated application icon</li>
+        <ul>
+          <li>Translated image captions</li>
+          <li>Updated screenshots to use a more reasonable window size</li>
+          <li>Updated application icon</li>
+        </ul>
       </description>
     </release>
     <release version="1.0.4" date="2026-01-06">
@@ -119,7 +121,8 @@
           This release focuses on visuals and localization.
         </p>
         <ul>
-          <li>Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark ones.</li>
+          <li>Fine-tuned dark/light mode detection so light colors are no longer mistaken for dark
+            ones.</li>
           <li>Polished translations and improved how they are applied.</li>
         </ul>
       </description>
