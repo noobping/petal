@@ -8,7 +8,7 @@
 
 Listen to J-POP and K-POP, or pause and resume the live stream. Stream and metadata provided by [LISTEN.moe](https://listen.moe).
 
-![screenshot](data/io.github.noobping.listenmoe.screenshot_green.png)
+![screenshot](data/screenshot2.png)
 
 ## About
 
