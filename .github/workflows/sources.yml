@@ -3,11 +3,20 @@ name: Flatpak Cargo Sources
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+      - master
+      - develop
+      - development
     paths:
       - "Cargo.lock"
       - "Cargo.toml"
       - "**/Cargo.toml"
       - ".github/workflows/sources.yml"
+
+concurrency:
+  group: sources-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   generate:
