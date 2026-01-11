@@ -64,12 +64,12 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://raw.githubusercontent.com/noobping/listenmoe/v1.0.6/data/io.github.noobping.listenmoe.screenshot.png</image>
+        https://raw.githubusercontent.com/noobping/listenmoe/v1.0.8/data/io.github.noobping.listenmoe.screenshot.png</image>
       <caption>When connected and there is no album or artist image</caption>
     </screenshot>
     <screenshot>
       <image>
-        https://raw.githubusercontent.com/noobping/listenmoe/v1.0.6/data/io.github.noobping.listenmoe.screenshot_green.png</image>
+        https://raw.githubusercontent.com/noobping/listenmoe/v1.0.8/data/io.github.noobping.listenmoe.screenshot_green.png</image>
       <caption>Colored window when connected</caption>
     </screenshot>
   </screenshots>
@@ -79,6 +79,13 @@
   </provides>
 
   <releases>
+    <release version="1.0.8" date="2026-01-13">
+      <description>
+        <p>
+          Updated screenshots to use a more reasonable window size
+        </p>
+      </description>
+    </release>
     <release version="1.0.7" date="2026-01-12">
       <description>
         <p>
