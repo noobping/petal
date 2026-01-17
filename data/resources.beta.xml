@@ -1,5 +1,5 @@
 <gresources>
-	<gresource prefix="/io/github/noobping/listenmoe/beta">
+	<gresource prefix="/io/github/noobping/listenmoe">
 		<file>scalable/apps/io.github.noobping.listenmoe.beta.svg</file>
 		<file>128x128/apps/io.github.noobping.listenmoe.beta.png</file>
 		<file>symbolic/apps/io.github.noobping.listenmoe-symbolic.svg</file>

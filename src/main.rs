@@ -13,10 +13,8 @@ mod ui;
 const APP_ID: &str = "io.github.noobping.listenmoe.beta";
 #[cfg(not(any(debug_assertions, feature = "beta")))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
-#[cfg(all(target_os = "windows"), any(debug_assertions, feature = "beta"))]
+#[cfg(target_os = "windows")]
 const RESOURCE_ID: &str = "/io/github/noobping/listenmoe";
-#[cfg(all(target_os = "windows"), not(any(debug_assertions, feature = "beta")))]
-const RESOURCE_ID: &str = "/io/github/noobping/listenmoe/beta";
 #[cfg(target_os = "windows")]
 use adw::gtk::{gdk::Display, IconTheme};
 use adw::prelude::*;
