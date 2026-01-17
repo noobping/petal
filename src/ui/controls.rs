@@ -66,7 +66,7 @@ pub fn build_controls(
             .can_play(true)
             .can_pause(true)
             .can_go_next(true)
-            .can_go_previous(true)
+            .can_go_previous(false)
             .build()
             .await
             .expect("Failed to init MPRIS player")
