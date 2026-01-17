@@ -5,6 +5,7 @@ script:
   - cp data/128x128/apps/io.github.noobping.listenmoe.beta.png AppDir/usr/share/icons/hicolor/128x128/apps/
   - cp -r data/scalable/apps/* AppDir/usr/share/icons/hicolor/scalable/apps/
   - cp -r data/symbolic/apps/* AppDir/usr/share/icons/hicolor/symbolic/apps/
+  - cp AppDir/usr/share/icons/hicolor/symbolic/apps/io.github.noobping.listenmoe-symbolic.svg AppDir/usr/share/icons/hicolor/symbolic/apps/io.github.noobping.listenmoe.beta-symbolic.svg
   - cp -r data/symbolic/actions/* AppDir/usr/share/icons/hicolor/symbolic/actions/
   - cp target/release/listenmoe AppDir/usr/bin/
   - cp data/metainfo.xml.in AppDir/usr/share/metainfo/io.github.noobping.listenmoe.beta.appdata.xml
