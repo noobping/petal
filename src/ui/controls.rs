@@ -9,7 +9,6 @@ pub enum MediaControlEvent {
     Stop,
     Toggle,
     Next,
-    Previous,
 }
 
 pub struct MediaControls {

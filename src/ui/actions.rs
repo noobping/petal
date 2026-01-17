@@ -12,7 +12,7 @@ use gettextrs::gettext;
 use mpris_server::PlaybackStatus;
 use std::rc::Rc;
 #[cfg(target_os = "linux")]
-use std::{cell::RefCell, sync::mpsc, borrow::BorrowMut};
+use std::sync::mpsc;
 
 #[cfg(target_os = "linux")]
 use super::controls::{build_controls, MediaControlEvent, MediaControls};
@@ -43,19 +43,10 @@ pub fn build_actions(
     pause_button: &Button,
     radio: &Rc<Listen>,
     meta: &Rc<Meta>,
-) -> (
-    Rc<RefCell<MediaControls>>,
-    mpsc::Receiver<MediaControlEvent>,
-) {
-    let controls = build_controls(env!("CARGO_PKG_NAME"), "Listen Moe", APP_ID);
-    let (ctrl_tx, ctrl_rx) = mpsc::channel::<MediaControlEvent>();
-    let tx = ctrl_tx.clone();
-    controls
-        .borrow_mut()
-        .attach(move |event| {
-            let _ = tx.send(event);
-        })
-        .expect("Failed to attach media control events");
+) -> (Rc<MediaControls>, mpsc::Receiver<MediaControlEvent>) {
+    // build_controls already wires MPRIS callbacks into the returned receiver.
+    let (controls, ctrl_rx) = build_controls(env!("CARGO_PKG_NAME"), "Listen Moe", APP_ID);
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
@@ -63,6 +54,7 @@ pub fn build_actions(
         let play = play_button.clone();
         let pause = pause_button.clone();
         let controls = controls.clone();
+
         make_action("play", move || {
             win.set_title("Listen Moe");
             win.set_subtitle("Connecting...");
@@ -70,11 +62,10 @@ pub fn build_actions(
             radio.start();
             play.set_visible(false);
             pause.set_visible(true);
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Playing { progress: None });
+            controls.set_playback(PlaybackStatus::Playing);
         })
     });
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
@@ -82,6 +73,7 @@ pub fn build_actions(
         let play = play_button.clone();
         let pause = pause_button.clone();
         let controls = controls.clone();
+
         make_action("pause", move || {
             meta.pause();
             radio.pause();
@@ -89,11 +81,10 @@ pub fn build_actions(
             play.set_visible(true);
             win.set_title("Listen Moe");
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Paused { progress: None });
+            controls.set_playback(PlaybackStatus::Paused);
         })
     });
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
@@ -101,6 +92,7 @@ pub fn build_actions(
         let play = play_button.clone();
         let stop = pause_button.clone();
         let controls = controls.clone();
+
         make_action("stop", move || {
             meta.stop();
             radio.stop();
@@ -108,11 +100,10 @@ pub fn build_actions(
             play.set_visible(true);
             win.set_title("Listen Moe");
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Paused { progress: None });
+            controls.set_playback(PlaybackStatus::Stopped);
         })
     });
+
     add_actions(window, win_title, play_button, pause_button, radio, meta);
     add_accels(app);
 
