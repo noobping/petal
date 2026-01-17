@@ -3,7 +3,6 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=data");
 
-    const APP_ID: &str = "io.github.noobping.listenmoe";
     glib_build_tools::compile_resources(
         &["data"],
         &format!("data/resources.xml"),
