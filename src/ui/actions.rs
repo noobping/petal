@@ -21,6 +21,9 @@ use crate::meta::Meta;
 use crate::station::Station;
 
 const APP_NAME: &str = "Listen Moe";
+#[cfg(debug_assertions)]
+const APP_ID: &str = "io.github.noobping.listenmoe_beta";
+#[cfg(not(debug_assertions))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
 
 fn make_action<F>(name: &str, f: F) -> SimpleAction
