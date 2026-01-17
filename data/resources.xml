@@ -1,9 +1,7 @@
 <gresources>
 	<gresource prefix="/io/github/noobping/listenmoe">
 		<file>scalable/apps/io.github.noobping.listenmoe.svg</file>
-		<file>scalable/apps/io.github.noobping.listenmoe.beta.svg</file>
 		<file>128x128/apps/io.github.noobping.listenmoe.png</file>
-		<file>128x128/apps/io.github.noobping.listenmoe.beta.png</file>
 		<file>symbolic/apps/io.github.noobping.listenmoe-symbolic.svg</file>
 		<file>symbolic/actions/media-playback-pause-symbolic.svg</file>
 		<file>symbolic/actions/media-playback-start-symbolic.svg</file>

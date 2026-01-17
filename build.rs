@@ -1,17 +1,20 @@
-#[cfg(feature = "icon")]
+#[cfg(target_os = "windows")]
 fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=data");
 
+    #[cfg(any(debug_assertions, feature = "beta"))]
+    const PREFIX: &str = ".beta";
+    #[cfg(not(any(debug_assertions, feature = "beta")))]
+    const PREFIX: &str = "";
     const APP_ID: &str = "io.github.noobping.listenmoe";
     glib_build_tools::compile_resources(
         &["data"],
-        &format!("data/{APP_ID}.resources.xml"),
+        &format!("data/resources{PREFIX}.xml"),
         "compiled.gresource",
     );
-    #[cfg(target_os = "windows")]
     {
-        let ico_path = std::path::Path::new("data").join(format!("{APP_ID}.ico"));
+        let ico_path = std::path::Path::new("data").join(format!("{APP_ID}{PREFIX}.ico"));
         println!("cargo:rerun-if-changed={}", ico_path.display());
         let mut res = winresource::WindowsResource::new();
         res.set_icon(ico_path.to_string_lossy().as_ref());
@@ -19,5 +22,5 @@ fn main() {
     }
 }
 
-#[cfg(not(feature = "icon"))]
+#[cfg(target_os = "linux")]
 fn main() {}

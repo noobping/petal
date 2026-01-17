@@ -1,4 +1,5 @@
 mod actions;
+mod controls;
 mod cover;
 mod viz;
 mod window;

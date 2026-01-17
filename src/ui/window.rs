@@ -16,7 +16,7 @@ use adw::{
     Application, StyleManager, WindowTitle,
 };
 use gettextrs::gettext;
-#[cfg(all(target_os = "linux", feature = "controls"))]
+#[cfg(target_os = "linux")]
 use souvlaki::{MediaControlEvent, MediaMetadata};
 use std::{
     sync::{atomic::Ordering, mpsc},
@@ -63,7 +63,7 @@ pub fn build_ui(app: &Application) {
     style_manager.set_color_scheme(adw::ColorScheme::Default);
     let css_provider = cover::install_css_provider();
 
-    #[cfg(all(target_os = "linux", feature = "controls"))]
+    #[cfg(target_os = "linux")]
     let (controls, ctrl_rx) = actions::build_controls(
         &window,
         &app,
@@ -73,7 +73,7 @@ pub fn build_ui(app: &Application) {
         &radio,
         &meta,
     );
-    #[cfg(not(all(target_os = "linux", feature = "controls")))]
+    #[cfg(target_os = "windows")]
     actions::build_actions(
         &window,
         &app,
@@ -168,11 +168,11 @@ pub fn build_ui(app: &Application) {
         let art_picture = art_picture.clone();
         let cover_rx = cover_rx;
         let cover_tx = cover_tx.clone();
-        #[cfg(all(target_os = "linux", feature = "controls"))]
+        #[cfg(target_os = "linux")]
         let window = window.clone();
-        #[cfg(all(target_os = "linux", feature = "controls"))]
+        #[cfg(target_os = "linux")]
         let media_controls = controls.clone();
-        #[cfg(all(target_os = "linux", feature = "controls"))]
+        #[cfg(target_os = "linux")]
         let ctrl_rx = ctrl_rx;
         let clear_art_ui = |art_picture: &gtk::Picture,
                             art_popover: &gtk::Popover,
@@ -188,7 +188,7 @@ pub fn build_ui(app: &Application) {
         };
 
         glib::timeout_add_local(Duration::from_millis(100), move || {
-            #[cfg(all(target_os = "linux", feature = "controls"))]
+            #[cfg(target_os = "linux")]
             for event in ctrl_rx.try_iter() {
                 let _ = match event {
                     MediaControlEvent::Play => adw::prelude::WidgetExt::activate_action(
@@ -216,11 +216,6 @@ pub fn build_ui(app: &Application) {
                         "win.next_station",
                         None::<&glib::Variant>,
                     ),
-                    MediaControlEvent::Previous => adw::prelude::WidgetExt::activate_action(
-                        &window,
-                        "win.prev_station",
-                        None::<&glib::Variant>,
-                    ),
                     _ => Ok(()),
                 };
             }
@@ -229,14 +224,14 @@ pub fn build_ui(app: &Application) {
                 win.set_title(&info.artist);
                 win.set_subtitle(&info.title);
 
-                #[cfg(all(target_os = "linux", feature = "controls"))]
+                #[cfg(target_os = "linux")]
                 let cover_url = info
                     .album_cover
                     .as_ref()
                     .or(info.artist_image.as_ref())
                     .map(|s| s.as_str());
 
-                #[cfg(all(target_os = "linux", feature = "controls"))]
+                #[cfg(target_os = "linux")]
                 {
                     let mut controls = media_controls.borrow_mut();
                     let _ = controls.set_metadata(MediaMetadata {

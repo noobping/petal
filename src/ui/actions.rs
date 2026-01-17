@@ -8,9 +8,9 @@ use adw::gtk::{
 };
 use adw::{prelude::*, Application, WindowTitle};
 use gettextrs::gettext;
-#[cfg(all(target_os = "linux", feature = "controls"))]
+#[cfg(target_os = "linux")]
 use souvlaki::{MediaControlEvent, MediaControls, MediaPlayback, PlatformConfig};
-#[cfg(all(target_os = "linux", feature = "controls"))]
+#[cfg(target_os = "linux")]
 use std::{cell::RefCell, sync::mpsc};
 use std::rc::Rc;
 
@@ -32,7 +32,7 @@ where
     action
 }
 
-#[cfg(all(target_os = "linux", feature = "controls"))]
+#[cfg(target_os = "linux")]
 pub fn build_controls(
     window: &ApplicationWindow,
     app: &Application,
@@ -123,7 +123,7 @@ pub fn build_controls(
     (controls, ctrl_rx)
 }
 
-#[cfg(not(all(target_os = "linux", feature = "controls")))]
+#[cfg(target_os = "windows")]
 pub fn build_actions(
     window: &ApplicationWindow,
     app: &Application,
@@ -282,20 +282,6 @@ fn add_actions(
             meta.set_station(next);
         })
     });
-    window.add_action(&{
-        let radio = radio.clone();
-        let meta = meta.clone();
-        let play = play_button.clone();
-        make_action("prev_station", move || {
-            if play.is_visible() {
-                return; // paused -> do nothing
-            }
-            let current = radio.get_station();
-            let prev = other_station(current);
-            radio.set_station(prev);
-            meta.set_station(prev);
-        })
-    });
 }
 
 fn add_accels(app: &Application) {
@@ -304,7 +290,6 @@ fn add_accels(app: &Application) {
     app.set_accels_for_action("win.jpop", &["<primary>j"]);
     app.set_accels_for_action("win.kpop", &["<primary>k"]);
     app.set_accels_for_action("win.quit", &["<primary>q", "Escape"]);
-    app.set_accels_for_action("win.prev_station", &["<primary>z", "XF86AudioPrev"]);
     app.set_accels_for_action(
         "win.next_station",
         &["<primary>y", "<primary><shift>z", "XF86AudioNext"],
