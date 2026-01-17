@@ -8,19 +8,19 @@ use adw::gtk::{
 };
 use adw::{prelude::*, Application, WindowTitle};
 use gettextrs::gettext;
-#[cfg(all(target_os = "linux", feature = "controls"))]
-use souvlaki::{MediaControlEvent, MediaControls, MediaPlayback, PlatformConfig};
-#[cfg(all(target_os = "linux", feature = "controls"))]
-use std::{cell::RefCell, sync::mpsc};
+#[cfg(target_os = "linux")]
+use mpris_server::PlaybackStatus;
 use std::rc::Rc;
+#[cfg(target_os = "linux")]
+use std::sync::mpsc;
 
+#[cfg(target_os = "linux")]
+use super::controls::{build_controls, MediaControlEvent, MediaControls};
 use crate::listen::Listen;
 use crate::meta::Meta;
 use crate::station::Station;
 
-#[cfg(debug_assertions)]
-const APP_ID: &str = "io.github.noobping.listenmoe_develop";
-#[cfg(not(debug_assertions))]
+const APP_NAME: &str = "Listen Moe";
 const APP_ID: &str = "io.github.noobping.listenmoe";
 
 fn make_action<F>(name: &str, f: F) -> SimpleAction
@@ -32,98 +32,6 @@ where
     action
 }
 
-#[cfg(all(target_os = "linux", feature = "controls"))]
-pub fn build_controls(
-    window: &ApplicationWindow,
-    app: &Application,
-    win_title: &WindowTitle,
-    play_button: &Button,
-    pause_button: &Button,
-    radio: &Rc<Listen>,
-    meta: &Rc<Meta>,
-) -> (
-    Rc<RefCell<MediaControls>>,
-    mpsc::Receiver<MediaControlEvent>,
-) {
-    let platform_config = PlatformConfig {
-        display_name: "Listen Moe",
-        dbus_name: APP_ID,
-        hwnd: None,
-    };
-    let controls = MediaControls::new(platform_config).expect("Failed to init media controls");
-    let controls = Rc::new(RefCell::new(controls));
-    let (ctrl_tx, ctrl_rx) = mpsc::channel::<MediaControlEvent>();
-    let tx = ctrl_tx.clone();
-    controls
-        .borrow_mut()
-        .attach(move |event| {
-            let _ = tx.send(event);
-        })
-        .expect("Failed to attach media control events");
-    window.add_action(&{
-        let radio = radio.clone();
-        let meta = meta.clone();
-        let win = win_title.clone();
-        let play = play_button.clone();
-        let pause = pause_button.clone();
-        let controls = controls.clone();
-        make_action("play", move || {
-            win.set_title("Listen Moe");
-            win.set_subtitle("Connecting...");
-            meta.start();
-            radio.start();
-            play.set_visible(false);
-            pause.set_visible(true);
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Playing { progress: None });
-        })
-    });
-    window.add_action(&{
-        let radio = radio.clone();
-        let meta = meta.clone();
-        let win = win_title.clone();
-        let play = play_button.clone();
-        let pause = pause_button.clone();
-        let controls = controls.clone();
-        make_action("pause", move || {
-            meta.pause();
-            radio.pause();
-            pause.set_visible(false);
-            play.set_visible(true);
-            win.set_title("Listen Moe");
-            win.set_subtitle(&gettext("J-POP and K-POP radio"));
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Paused { progress: None });
-        })
-    });
-    window.add_action(&{
-        let radio = radio.clone();
-        let meta = meta.clone();
-        let win = win_title.clone();
-        let play = play_button.clone();
-        let stop = pause_button.clone();
-        let controls = controls.clone();
-        make_action("stop", move || {
-            meta.stop();
-            radio.stop();
-            stop.set_visible(false);
-            play.set_visible(true);
-            win.set_title("Listen Moe");
-            win.set_subtitle(&gettext("J-POP and K-POP radio"));
-            let _ = controls
-                .borrow_mut()
-                .set_playback(MediaPlayback::Paused { progress: None });
-        })
-    });
-    add_actions(window, win_title, play_button, pause_button, radio, meta);
-    add_accels(app);
-
-    (controls, ctrl_rx)
-}
-
-#[cfg(not(all(target_os = "linux", feature = "controls")))]
 pub fn build_actions(
     window: &ApplicationWindow,
     app: &Application,
@@ -132,54 +40,97 @@ pub fn build_actions(
     pause_button: &Button,
     radio: &Rc<Listen>,
     meta: &Rc<Meta>,
+) -> (
+    Option<Rc<MediaControls>>,
+    Option<mpsc::Receiver<MediaControlEvent>>,
 ) {
+    let (controls, ctrl_rx) = {
+        #[cfg(target_os = "linux")]
+        {
+            match build_controls(APP_ID, APP_NAME, APP_ID) {
+                Ok((controls, ctrl_rx)) => (Some(controls), Some(ctrl_rx)),
+                Err(e) => {
+                    eprintln!("Media control unavailable: {e}");
+                    (None, None)
+                }
+            }
+        }
+
+        #[cfg(not(target_os = "linux"))]
+        {
+            (None, None)
+        }
+    };
+    let set_playback = {
+        let controls = controls.clone();
+        move |status| {
+            if let Some(c) = controls.as_ref() {
+                c.set_playback(status);
+            }
+        }
+    };
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
         let win = win_title.clone();
         let play = play_button.clone();
         let pause = pause_button.clone();
+        let set_playback = set_playback.clone();
+
         make_action("play", move || {
-            win.set_title("Listen Moe");
+            win.set_title(APP_NAME);
             win.set_subtitle("Connecting...");
             meta.start();
             radio.start();
             play.set_visible(false);
             pause.set_visible(true);
+            set_playback(PlaybackStatus::Playing);
         })
     });
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
         let win = win_title.clone();
         let play = play_button.clone();
         let pause = pause_button.clone();
+        let set_playback = set_playback.clone();
+
         make_action("pause", move || {
             meta.pause();
             radio.pause();
             pause.set_visible(false);
             play.set_visible(true);
-            win.set_title("Listen Moe");
+            win.set_title(APP_NAME);
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
+            set_playback(PlaybackStatus::Paused);
         })
     });
+
     window.add_action(&{
         let radio = radio.clone();
         let meta = meta.clone();
         let win = win_title.clone();
         let play = play_button.clone();
-        let stop = pause_button.clone();
+        let pause = pause_button.clone();
+        let set_playback = set_playback.clone();
+
         make_action("stop", move || {
             meta.stop();
             radio.stop();
-            stop.set_visible(false);
+            pause.set_visible(false);
             play.set_visible(true);
-            win.set_title("Listen Moe");
+            win.set_title(APP_NAME);
             win.set_subtitle(&gettext("J-POP and K-POP radio"));
+            set_playback(PlaybackStatus::Stopped);
         })
     });
+
     add_actions(window, win_title, play_button, pause_button, radio, meta);
     add_accels(app);
+
+    (controls, ctrl_rx)
 }
 
 fn add_actions(
@@ -203,10 +154,13 @@ fn add_actions(
             let comments = gettext(
                 "It is time to ditch other radios. Stream and metadata provided by LISTEN.moe.",
             );
+            let version = env!("CARGO_PKG_VERSION");
+            #[cfg(debug_assertions)]
+            let version = format!("{}-beta", version);
             let about = adw::AboutDialog::builder()
-                .application_name("Listen Moe")
+                .application_name(APP_NAME)
                 .application_icon(APP_ID)
-                .version(env!("CARGO_PKG_VERSION"))
+                .version(version)
                 .developers(&authors[..])
                 .translator_credits(gettext("AI translation (GPT-5.2); reviewed by nobody"))
                 .website(homepage)
@@ -279,20 +233,6 @@ fn add_actions(
             meta.set_station(next);
         })
     });
-    window.add_action(&{
-        let radio = radio.clone();
-        let meta = meta.clone();
-        let play = play_button.clone();
-        make_action("prev_station", move || {
-            if play.is_visible() {
-                return; // paused -> do nothing
-            }
-            let current = radio.get_station();
-            let prev = other_station(current);
-            radio.set_station(prev);
-            meta.set_station(prev);
-        })
-    });
 }
 
 fn add_accels(app: &Application) {
@@ -301,7 +241,6 @@ fn add_accels(app: &Application) {
     app.set_accels_for_action("win.jpop", &["<primary>j"]);
     app.set_accels_for_action("win.kpop", &["<primary>k"]);
     app.set_accels_for_action("win.quit", &["<primary>q", "Escape"]);
-    app.set_accels_for_action("win.prev_station", &["<primary>z", "XF86AudioPrev"]);
     app.set_accels_for_action(
         "win.next_station",
         &["<primary>y", "<primary><shift>z", "XF86AudioNext"],
