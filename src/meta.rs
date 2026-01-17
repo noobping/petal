@@ -18,7 +18,7 @@ use tungstenite::protocol::WebSocket;
 use tungstenite::stream::MaybeTlsStream;
 use tungstenite::Message;
 
-#[cfg(debug_assertions)]
+#[cfg(any(debug_assertions, feature = "beta"))]
 use crate::log::now_string;
 use crate::station::Station;
 
@@ -264,7 +264,7 @@ fn run_once(
     let url = station.ws_url();
     let (mut ws, _response) = connect(url)?;
     set_maybe_tls_read_timeout(ws.get_mut(), Duration::from_millis(200))?;
-    #[cfg(debug_assertions)]
+    #[cfg(any(debug_assertions, feature = "beta"))]
     println!("[{}] Gateway connected to LISTEN.moe", now_string());
 
     // Read hello and get heartbeat interval (if any).
@@ -286,20 +286,20 @@ fn run_once(
                 break;
             }
             Ok(Control::Pause) => {
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 println!("[{}] Pausing meta data", now_string());
                 paused = true;
                 ui_sched_id.fetch_add(1, Ordering::Relaxed); // invalidate any pending scheduled sends
             }
             Ok(Control::Resume) => {
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 println!("[{}] Resuming meta data", now_string());
                 paused = false;
                 ui_sched_id.fetch_add(1, Ordering::Relaxed); // invalidate timers from before pause
 
                 // Snap UI to the track that matches buffered playback time.
                 let lag = lag_ms.load(Ordering::Relaxed);
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 if let Some(t) = pick_track_for_playback(&history, lag) {
                     println!("[{}] ui snap: {} - {}", now_string(), t.artist, t.title);
                 }
@@ -352,12 +352,12 @@ fn run_once(
 
         match (env.op, env.t.as_deref()) {
             (OP_HEARTBEAT_ACK, _) => {
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 println!("[{}] Gateway heartbeat", now_string());
             }
             (OP_DISPATCH, Some(EVENT_TRACK_UPDATE)) => {
                 if let Some(info) = parse_track_info(&env.d) {
-                    #[cfg(debug_assertions)]
+                    #[cfg(any(debug_assertions, feature = "beta"))]
                     println!(
                         "[{}] live track update: {} - {} (duration={})",
                         now_string(),
@@ -373,7 +373,7 @@ fn run_once(
                     if !paused {
                         let lag = lag_ms.load(Ordering::Relaxed);
                         let my_id = ui_sched_id.fetch_add(1, Ordering::Relaxed) + 1;
-                        #[cfg(debug_assertions)]
+                        #[cfg(any(debug_assertions, feature = "beta"))]
                         println!(
                             "[{}] ui {} scheduled: {} - {} (lag_ms={})",
                             now_string(),
@@ -566,7 +566,7 @@ fn schedule_next_from_history(
 
     let my_id = ui_sched_id.fetch_add(1, Ordering::Relaxed) + 1;
 
-    #[cfg(debug_assertions)]
+    #[cfg(any(debug_assertions, feature = "beta"))]
     println!(
         "[{}] ui {} resched-next: {} - {} (lag_ms={})",
         now_string(),

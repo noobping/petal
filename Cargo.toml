@@ -15,9 +15,10 @@ ProductName = "LISTEN.moe"
 FileDescription = "J-POP and K-POP radio"
 
 [features]
+beta = []
+controls = ["souvlaki"]
 default = ["controls"]
 icon = ["winresource", "glib-build-tools"]
-controls = ["souvlaki"]
 
 [dependencies]
 rodio = { version = "0.21.1", default-features = false, features = ["playback"] }

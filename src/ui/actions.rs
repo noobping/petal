@@ -18,9 +18,9 @@ use crate::listen::Listen;
 use crate::meta::Meta;
 use crate::station::Station;
 
-#[cfg(debug_assertions)]
-const APP_ID: &str = "io.github.noobping.listenmoe_develop";
-#[cfg(not(debug_assertions))]
+#[cfg(any(debug_assertions, feature = "beta"))]
+const APP_ID: &str = "io.github.noobping.listenmoe.beta";
+#[cfg(not(any(debug_assertions, feature = "beta")))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
 
 fn make_action<F>(name: &str, f: F) -> SimpleAction
@@ -203,10 +203,13 @@ fn add_actions(
             let comments = gettext(
                 "It is time to ditch other radios. Stream and metadata provided by LISTEN.moe.",
             );
+            let version = env!("CARGO_PKG_VERSION");
+            #[cfg(any(debug_assertions, feature = "beta"))]
+            let version = format!("{}-beta", version);
             let about = adw::AboutDialog::builder()
                 .application_name("Listen Moe")
                 .application_icon(APP_ID)
-                .version(env!("CARGO_PKG_VERSION"))
+                .version(version)
                 .developers(&authors[..])
                 .translator_credits(gettext("AI translation (GPT-5.2); reviewed by nobody"))
                 .website(homepage)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.noobping.listenmoe</id>
+  <id>APP_ID</id>
   <name>Listen Moe</name>
   <summary>J-POP and K-POP radio</summary>
   <description>

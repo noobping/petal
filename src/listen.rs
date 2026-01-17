@@ -21,7 +21,7 @@ use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 
 use crate::http_source::HttpSource;
-#[cfg(debug_assertions)]
+#[cfg(any(debug_assertions, feature = "beta"))]
 use crate::log::now_string;
 use crate::station::Station;
 
@@ -234,11 +234,11 @@ fn open_stream(
     u32,
     Box<dyn symphonia::core::codecs::Decoder>,
 )> {
-    #[cfg(debug_assertions)]
+    #[cfg(any(debug_assertions, feature = "beta"))]
     println!("[{}] Connecting to {url}…", now_string());
 
     let response = client.get(url).header("User-Agent", useragent).send()?;
-    #[cfg(debug_assertions)]
+    #[cfg(any(debug_assertions, feature = "beta"))]
     println!("[{}] HTTP status: {}", now_string(), response.status());
 
     if !response.status().is_success() {
@@ -277,14 +277,14 @@ fn handle_control(
     while let Ok(cmd) = rx.try_recv() {
         match cmd {
             Control::Stop => {
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 println!("[{}] Stop requested, shutting down stream.", now_string());
                 sink.stop();
                 return Ok(true);
             }
             Control::Pause => {
                 if !*paused {
-                    #[cfg(debug_assertions)]
+                    #[cfg(any(debug_assertions, feature = "beta"))]
                     println!("[{}] Pausing playback.", now_string());
                     *paused = true;
                     sink.pause();
@@ -294,7 +294,7 @@ fn handle_control(
             }
             Control::Resume => {
                 if *paused {
-                    #[cfg(debug_assertions)]
+                    #[cfg(any(debug_assertions, feature = "beta"))]
                     println!("[{}] Resuming playback.", now_string());
                     *paused = false;
                     sink.play();
@@ -346,7 +346,7 @@ fn decode_and_process_packet(
         Ok(buf) => buf,
         Err(SymphoniaError::DecodeError(_)) => return Ok((PacketOutcome::Continue, None)),
         Err(SymphoniaError::ResetRequired) => {
-            #[cfg(debug_assertions)]
+            #[cfg(any(debug_assertions, feature = "beta"))]
             println!("[{}] Decoder reset required, rebuilding decoder…", now_string());
 
             let new_track = format
@@ -509,7 +509,7 @@ fn run_one_connection(
         let packet = match format.next_packet() {
             Ok(p) => p,
             Err(SymphoniaError::ResetRequired) => {
-                #[cfg(debug_assertions)]
+                #[cfg(any(debug_assertions, feature = "beta"))]
                 println!("[{}] Stream reset, reconfiguring decoder…", now_string());
 
                 let new_track = format
@@ -637,7 +637,7 @@ fn run_listenmoe_stream(
             &spectrum_bits,
         );
 
-        #[cfg(debug_assertions)]
+        #[cfg(any(debug_assertions, feature = "beta"))]
         println!("[{}] Started decoding + playback.", now_string());
 
         let outcome = run_one_connection(

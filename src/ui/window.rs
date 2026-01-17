@@ -28,9 +28,9 @@ use super::{actions, cover, viz};
 
 const COVER_MAX_SIZE: i32 = 250;
 
-#[cfg(debug_assertions)]
-const APP_ID: &str = "io.github.noobping.listenmoe_develop";
-#[cfg(not(debug_assertions))]
+#[cfg(any(debug_assertions, feature = "beta"))]
+const APP_ID: &str = "io.github.noobping.listenmoe.beta";
+#[cfg(not(any(debug_assertions, feature = "beta")))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
 
 pub fn build_ui(app: &Application) {

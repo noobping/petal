@@ -6,6 +6,6 @@ Name=Listen Moe
 Comment=J-POP and K-POP radio
 Categories=AudioVideo;Audio;Music;
 Keywords=Radio;Audio;J-POP;K-POP;
-Icon=io.github.noobping.listenmoe
+Icon=APP_ID
 Exec=listenmoe
 Terminal=false

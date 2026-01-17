@@ -3,15 +3,15 @@
 mod http_source;
 mod listen;
 mod locale;
-#[cfg(debug_assertions)]
+#[cfg(any(debug_assertions, feature = "beta"))]
 mod log;
 mod meta;
 mod station;
 mod ui;
 
-#[cfg(debug_assertions)]
-const APP_ID: &str = "io.github.noobping.listenmoe_develop";
-#[cfg(not(debug_assertions))]
+#[cfg(any(debug_assertions, feature = "beta"))]
+const APP_ID: &str = "io.github.noobping.listenmoe.beta";
+#[cfg(not(any(debug_assertions, feature = "beta")))]
 const APP_ID: &str = "io.github.noobping.listenmoe";
 #[cfg(feature = "icon")]
 const RESOURCE_ID: &str = "/io/github/noobping/listenmoe";

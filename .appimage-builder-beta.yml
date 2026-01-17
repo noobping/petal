@@ -2,21 +2,21 @@ version: 1
 
 script:
   - mkdir -p AppDir/usr/bin AppDir/usr/share/icons/hicolor/{128x128,scalable,symbolic}/{apps,actions} AppDir/usr/share/metainfo
-  - cp data/128x128/apps/io.github.noobping.listenmoe.png AppDir/usr/share/icons/hicolor/128x128/apps/
+  - cp data/128x128/apps/io.github.noobping.listenmoe.beta.png AppDir/usr/share/icons/hicolor/128x128/apps/
   - cp -r data/scalable/apps/* AppDir/usr/share/icons/hicolor/scalable/apps/
   - cp -r data/symbolic/apps/* AppDir/usr/share/icons/hicolor/symbolic/apps/
   - cp -r data/symbolic/actions/* AppDir/usr/share/icons/hicolor/symbolic/actions/
   - cp target/release/listenmoe AppDir/usr/bin/
-  - cp data/metainfo.xml.in AppDir/usr/share/metainfo/io.github.noobping.listenmoe.appdata.xml
-  - sed -i "s|APP_ID|io.github.noobping.listenmoe|g" AppDir/usr/share/metainfo/io.github.noobping.listenmoe.appdata.xml
+  - cp data/metainfo.xml.in AppDir/usr/share/metainfo/io.github.noobping.listenmoe.beta.appdata.xml
+  - sed -i "s|APP_ID|io.github.noobping.listenmoe.beta|g" AppDir/usr/share/metainfo/io.github.noobping.listenmoe.beta.appdata.xml
 
 AppDir:
   path: ./AppDir
 
   app_info:
-    id: io.github.noobping.listenmoe
+    id: io.github.noobping.listenmoe.beta
     name: "Listen Moe"
-    icon: io.github.noobping.listenmoe
+    icon: io.github.noobping.listenmoe.beta
     version: "1.0.9"
     exec: usr/bin/listenmoe
 
