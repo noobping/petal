@@ -22,9 +22,9 @@ use std::{
     time::Duration,
 };
 
-use super::{actions, cover, viz};
 #[cfg(target_os = "linux")]
 use super::controls::MediaControlEvent;
+use super::{actions, cover, viz};
 
 const COVER_MAX_SIZE: i32 = 250;
 
@@ -216,7 +216,6 @@ pub fn build_ui(app: &Application) {
                         "win.next_station",
                         None::<&glib::Variant>,
                     ),
-                    _ => Ok(()),
                 };
             }
 
