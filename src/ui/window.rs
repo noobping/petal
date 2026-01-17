@@ -16,8 +16,6 @@ use adw::{
     Application, StyleManager, WindowTitle,
 };
 use gettextrs::gettext;
-#[cfg(target_os = "linux")]
-use souvlaki::{MediaControlEvent, MediaMetadata};
 use std::{
     sync::{atomic::Ordering, mpsc},
     thread,
@@ -25,6 +23,8 @@ use std::{
 };
 
 use super::{actions, cover, viz};
+#[cfg(target_os = "linux")]
+use crate::controls::MediaControlEvent;
 
 const COVER_MAX_SIZE: i32 = 250;
 
@@ -64,7 +64,7 @@ pub fn build_ui(app: &Application) {
     let css_provider = cover::install_css_provider();
 
     #[cfg(target_os = "linux")]
-    let (controls, ctrl_rx) = actions::build_controls(
+    let (controls, ctrl_rx) = actions::build_actions(
         &window,
         &app,
         &win_title,
@@ -232,16 +232,7 @@ pub fn build_ui(app: &Application) {
                     .map(|s| s.as_str());
 
                 #[cfg(target_os = "linux")]
-                {
-                    let mut controls = media_controls.borrow_mut();
-                    let _ = controls.set_metadata(MediaMetadata {
-                        title: Some(&info.title),
-                        artist: Some(&info.artist),
-                        album: Some("Listen Moe"),
-                        cover_url: cover_url, // becomes None if no cover
-                        ..Default::default()
-                    });
-                }
+                media_controls.set_metadata(&info.title, &info.artist, "Listen Moe", cover_url);
 
                 if let Some(url) = info.album_cover.as_ref().or(info.artist_image.as_ref()) {
                     let tx = cover_tx.clone();

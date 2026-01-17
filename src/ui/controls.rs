@@ -1,17 +1,23 @@
-use mpris_server::{Metadata, PlaybackStatus, Player, TrackId};
+use adw::glib;
+use mpris_server::{Metadata, PlaybackStatus, Player};
 use std::{cell::RefCell, rc::Rc, sync::mpsc};
 
-#[cfg(any(debug_assertions, feature = "beta"))]
-const APP_ID: &str = "io.github.noobping.listenmoe.beta";
-#[cfg(not(any(debug_assertions, feature = "beta")))]
-const APP_ID: &str = "io.github.noobping.listenmoe";
-
-pub struct MprisControls {
-    player: Rc<Player>,
-    track_counter: Rc<RefCell<u64>>,
+#[derive(Debug, Clone, Copy)]
+pub enum MediaControlEvent {
+    Play,
+    Pause,
+    Stop,
+    Toggle,
+    Next,
+    Previous,
 }
 
-impl MprisControls {
+pub struct MediaControls {
+    player: Rc<Player>,
+    track_n: Rc<RefCell<u64>>,
+}
+
+impl MediaControls {
     pub fn set_playback(&self, status: PlaybackStatus) {
         let player = self.player.clone();
         glib::MainContext::default().spawn_local(async move {
@@ -19,19 +25,18 @@ impl MprisControls {
         });
     }
 
-    pub fn set_metadata(&self, title: String, artist: String, album: String, art_url: Option<String>) {
+    pub fn set_metadata(&self, title: &str, artist: &str, album: &str, art_url: Option<&str>) {
         let player = self.player.clone();
-        let track_counter = self.track_counter.clone();
+        let track_n = self.track_n.clone();
+        let title = title.to_string();
+        let artist = artist.to_string();
+        let album = album.to_string();
+        let art_url = art_url.map(str::to_string);
 
         glib::MainContext::default().spawn_local(async move {
-            // Object path: /io/github/noobping/listenmoe/track/NNN
-            let mut n = track_counter.borrow_mut();
-            *n += 1;
-            let track_id = TrackId::try_from(format!("/io/github/noobping/listenmoe/track/{}", *n))
-                .unwrap_or(TrackId::NO_TRACK);
+            *track_n.borrow_mut() += 1;
 
             let mut b = Metadata::builder()
-                .trackid(track_id)
                 .title(title)
                 .artist([artist])
                 .album(album);
@@ -45,60 +50,59 @@ impl MprisControls {
     }
 }
 
-pub fn build_controls_mpris(
-    // you can keep your original args if you want; not all are needed here
-) -> (Rc<MprisControls>, mpsc::Receiver<MediaControlEvent>) {
-    let (ctrl_tx, ctrl_rx) = mpsc::channel::<MediaControlEvent>();
+pub fn build_controls(
+    bus_suffix: &str,      // e.g. "listenmoe"
+    identity: &str,        // "Listen Moe"
+    desktop_entry: &str,   // MUST match installed .desktop basename: "io.github.noobping.listenmoe"
+) -> (Rc<MediaControls>, mpsc::Receiver<MediaControlEvent>) {
+    let (tx, rx) = mpsc::channel();
 
-    // IMPORTANT:
-    // - bus_name_suffix: can be whatever unique-ish (I avoid dots to keep it simple)
-    // - desktop_entry: MUST match the installed .desktop basename (no ".desktop")
+    // Create player (async) on the GLib main context
     let ctx = glib::MainContext::default();
     let player = ctx.block_on(async {
-        Player::builder(env!("CARGO_PKG_NAME")) // org.mpris.MediaPlayer2.listenmoe
-            .identity("Listen Moe")
-            .desktop_entry(APP_ID)
+        Player::builder(bus_suffix)
+            .identity(identity)
+            .desktop_entry(desktop_entry)
             .can_control(true)
             .can_play(true)
             .can_pause(true)
             .can_go_next(true)
-            .can_go_previous(false)
+            .can_go_previous(true)
             .build()
             .await
             .expect("Failed to init MPRIS player")
     });
 
-    let player = Rc::new(player);
-
-    // Must run the server task ASAP after creating the player. :contentReference[oaicite:3]{index=3}
-    ctx.spawn_local(player.run());
-
-    // Wire MPRIS method calls -> your existing event channel
+    // Wire MPRIS calls -> our events
     {
-        let tx = ctrl_tx.clone();
+        let tx = tx.clone();
         player.connect_play(move |_| { let _ = tx.send(MediaControlEvent::Play); });
     }
     {
-        let tx = ctrl_tx.clone();
+        let tx = tx.clone();
         player.connect_pause(move |_| { let _ = tx.send(MediaControlEvent::Pause); });
     }
     {
-        let tx = ctrl_tx.clone();
+        let tx = tx.clone();
         player.connect_stop(move |_| { let _ = tx.send(MediaControlEvent::Stop); });
     }
     {
-        let tx = ctrl_tx.clone();
+        let tx = tx.clone();
         player.connect_play_pause(move |_| { let _ = tx.send(MediaControlEvent::Toggle); });
     }
     {
-        let tx = ctrl_tx.clone();
+        let tx = tx.clone();
         player.connect_next(move |_| { let _ = tx.send(MediaControlEvent::Next); });
     }
 
-    let controls = Rc::new(MprisControls {
+    // Run event handler task (required) :contentReference[oaicite:1]{index=1}
+    let player = Rc::new(player);
+    ctx.spawn_local(player.clone().run());
+
+    let controls = Rc::new(MediaControls {
         player,
-        track_counter: Rc::new(RefCell::new(0)),
+        track_n: Rc::new(RefCell::new(0)),
     });
 
-    (controls, ctrl_rx)
+    (controls, rx)
 }

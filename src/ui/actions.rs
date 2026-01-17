@@ -8,12 +8,12 @@ use adw::gtk::{
 };
 use adw::{prelude::*, Application, WindowTitle};
 use gettextrs::gettext;
-#[cfg(target_os = "linux")]
-use souvlaki::{MediaControlEvent, MediaControls, MediaPlayback, PlatformConfig};
+use std::rc::Rc;
 #[cfg(target_os = "linux")]
 use std::{cell::RefCell, sync::mpsc};
-use std::rc::Rc;
 
+#[cfg(target_os = "linux")]
+use crate::controls::{build_mpris_controls, MediaControlEvent, MediaControls};
 use crate::listen::Listen;
 use crate::meta::Meta;
 use crate::station::Station;
@@ -33,7 +33,7 @@ where
 }
 
 #[cfg(target_os = "linux")]
-pub fn build_controls(
+pub fn build_actions(
     window: &ApplicationWindow,
     app: &Application,
     win_title: &WindowTitle,
