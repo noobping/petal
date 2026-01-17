@@ -24,7 +24,7 @@ use std::{
 
 use super::{actions, cover, viz};
 #[cfg(target_os = "linux")]
-use crate::controls::MediaControlEvent;
+use super::controls::MediaControlEvent;
 
 const COVER_MAX_SIZE: i32 = 250;
 

@@ -8,12 +8,14 @@ use adw::gtk::{
 };
 use adw::{prelude::*, Application, WindowTitle};
 use gettextrs::gettext;
+#[cfg(target_os = "linux")]
+use mpris_server::PlaybackStatus;
 use std::rc::Rc;
 #[cfg(target_os = "linux")]
-use std::{cell::RefCell, sync::mpsc};
+use std::{cell::RefCell, sync::mpsc, borrow::BorrowMut};
 
 #[cfg(target_os = "linux")]
-use crate::controls::{build_mpris_controls, MediaControlEvent, MediaControls};
+use super::controls::{build_controls, MediaControlEvent, MediaControls};
 use crate::listen::Listen;
 use crate::meta::Meta;
 use crate::station::Station;
@@ -45,13 +47,7 @@ pub fn build_actions(
     Rc<RefCell<MediaControls>>,
     mpsc::Receiver<MediaControlEvent>,
 ) {
-    let platform_config = PlatformConfig {
-        display_name: "Listen Moe",
-        dbus_name: APP_ID,
-        hwnd: None,
-    };
-    let controls = MediaControls::new(platform_config).expect("Failed to init media controls");
-    let controls = Rc::new(RefCell::new(controls));
+    let controls = build_controls(env!("CARGO_PKG_NAME"), "Listen Moe", APP_ID);
     let (ctrl_tx, ctrl_rx) = mpsc::channel::<MediaControlEvent>();
     let tx = ctrl_tx.clone();
     controls
