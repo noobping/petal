@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.9\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.10\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,3 +80,6 @@ msgstr "より適切なウィンドウサイズを使用するようスクリー
 
 msgid "Updated application icon"
 msgstr "アプリケーションアイコンを更新"
+
+msgid "Display the application icon in media controls."
+msgstr "メディアコントロールにアプリケーションのアイコンを表示する。"

@@ -79,6 +79,13 @@
   </provides>
 
   <releases>
+    <release version="1.0.10" date="2026-01-18">
+      <description>
+        <p>
+          Display the application icon in media controls.
+        </p>
+      </description>
+    </release>
     <release version="1.0.9" date="2026-01-14">
       <description>
         <p>

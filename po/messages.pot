@@ -81,3 +81,6 @@ msgstr ""
 
 msgid "Updated application icon"
 msgstr ""
+
+msgid "Display the application icon in media controls."
+msgstr ""

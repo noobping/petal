@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.0.9\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.0.10\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,3 +80,6 @@ msgstr "Screenshots bijgewerkt"
 
 msgid "Updated application icon"
 msgstr "Applicatie-icoon bijgewerkt"
+
+msgid "Display the application icon in media controls."
+msgstr "De mediabediening toont nu het applicatie-icoon."
