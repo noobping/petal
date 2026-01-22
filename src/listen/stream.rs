@@ -1,6 +1,7 @@
 use reqwest::blocking::Client;
 use rodio::{buffer::SamplesBuffer, OutputStreamBuilder, Sink};
 use std::sync::{atomic::AtomicU32, mpsc, Arc};
+use std::time::Duration;
 use symphonia::core::codecs::{DecoderOptions, CODEC_TYPE_NULL};
 use symphonia::core::errors::Error as SymphoniaError;
 use symphonia::core::formats::FormatOptions;
@@ -23,6 +24,13 @@ use super::{Control, Result};
 enum RunOutcome {
     Stop,
     Reconnect,
+}
+
+fn build_client() -> Result<Client> {
+    Ok(Client::builder()
+        .pool_max_idle_per_host(0)
+        .connect_timeout(Duration::from_secs(5))
+        .build()?)
 }
 
 fn build_useragent() -> String {
@@ -231,7 +239,7 @@ pub(super) fn run_listenmoe_stream(
     let fallback = station.stream_fallback_url().to_string();
     let mut use_fallback = false;
 
-    let client = Client::new();
+    let mut client = build_client()?;
     let useragent = build_useragent();
 
     let format_opts: FormatOptions = Default::default();
@@ -240,6 +248,9 @@ pub(super) fn run_listenmoe_stream(
 
     let stream = OutputStreamBuilder::open_default_stream()?;
     let mut sink = Sink::connect_new(&stream.mixer());
+
+    let mut paused = false;
+    let mut bars_enabled = true;
 
     let mut fft_state = make_fft_state(spectrum_bits.len());
     let viz = VizParams {
@@ -263,11 +274,11 @@ pub(super) fn run_listenmoe_stream(
             Ok(x) => x,
             Err(e) => {
                 eprintln!("connect/probe error on {url}: {e}");
-                if !use_fallback && !fallback.is_empty() {
-                    use_fallback = true;
-                    continue;
+                if !fallback.is_empty() {
+                    use_fallback = !use_fallback;
                 }
-                return Err(e);
+                client = build_client()?;
+                continue;
             }
         };
 
@@ -292,8 +303,8 @@ pub(super) fn run_listenmoe_stream(
             &mut decoder,
             &decoder_opts,
             &mut sink,
-            &mut false, // paused local to connection
-            &mut true,  // bars_enabled local to connection
+            &mut paused,
+            &mut bars_enabled,
             &mut fft_state,
             viz,
         )?;
