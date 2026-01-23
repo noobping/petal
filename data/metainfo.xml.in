@@ -79,6 +79,13 @@
   </provides>
 
   <releases>
+    <release version="1.0.11" date="2026-01-23">
+      <description>
+        <p>
+          Streaming logic now better handles connection issues and stream changes.
+        </p>
+      </description>
+    </release>
     <release version="1.0.10" date="2026-01-18">
       <description>
         <p>
