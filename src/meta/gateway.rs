@@ -139,6 +139,11 @@ fn run_once(
     let heartbeat_dur = heartbeat_ms.map(Duration::from_millis);
     let mut last_heartbeat: Option<Instant> = heartbeat_dur.map(|_| Instant::now());
 
+    // Liveness tracking: when the network interface changes, the socket may stop delivering
+    // messages without cleanly closing.
+    let mut last_any_msg = Instant::now();
+    let mut last_heartbeat_ack: Option<Instant> = heartbeat_dur.map(|_| Instant::now());
+
     let mut paused = false;
     let mut history: VecDeque<TrackInfo> = VecDeque::with_capacity(32);
 
@@ -177,7 +182,7 @@ fn run_once(
             Err(mpsc::TryRecvError::Empty) => {}
         }
 
-        // Heartbeat: if we know an interval, send a heartbeat when it elapses.
+        // Heartbeat: if an interval is known, send a heartbeat when it elapses.
         if let (Some(interval), Some(last)) = (heartbeat_dur, last_heartbeat.as_mut()) {
             if last.elapsed() >= interval {
                 if let Err(err) = ws.send(Message::Text(r#"{"op":9}"#.into())) {
@@ -185,6 +190,30 @@ fn run_once(
                     break;
                 }
                 *last = Instant::now();
+            }
+        }
+
+        // If the socket goes silent, force a reconnect.
+        if let Some(hb) = heartbeat_ms {
+            if let Some(ack) = last_heartbeat_ack.as_ref() {
+                let max_silence = Duration::from_millis(hb.saturating_mul(3));
+                if ack.elapsed() > max_silence {
+                    eprintln!(
+                        "Gateway heartbeat ACK timeout (>{:?}); reconnecting…",
+                        max_silence
+                    );
+                    break;
+                }
+            }
+        } else {
+            // No heartbeat info from the server — fall back to a generic inactivity timeout.
+            const MAX_INACTIVITY: Duration = Duration::from_secs(30);
+            if last_any_msg.elapsed() > MAX_INACTIVITY {
+                eprintln!(
+                    "Gateway inactivity timeout (>{:?}); reconnecting…",
+                    MAX_INACTIVITY
+                );
+                break;
             }
         }
 
@@ -196,7 +225,8 @@ fn run_once(
                 if e.kind() == std::io::ErrorKind::WouldBlock
                     || e.kind() == std::io::ErrorKind::TimedOut =>
             {
-                continue; // No websocket message right now; loop again so the process can pause
+                // No websocket message right now; loop again so the process can check controls/heartbeats.
+                continue;
             }
             Err(err) => return Err(Box::new(err)),
         };
@@ -214,8 +244,11 @@ fn run_once(
             }
         };
 
+        last_any_msg = Instant::now();
+
         match (env.op, env.t.as_deref()) {
             (OP_HEARTBEAT_ACK, _) => {
+                last_heartbeat_ack = Some(Instant::now());
                 #[cfg(debug_assertions)]
                 println!("[{}] Gateway heartbeat", now_string());
             }
