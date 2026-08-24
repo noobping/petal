@@ -50,12 +50,12 @@ pub(super) fn make_track_progress() -> (gtk::DrawingArea, TrackProgress) {
         let inset = LINE_WIDTH / 2.0;
         let start_x = inset;
         let end_x = (width - inset).max(start_x);
-        let y = height - inset;
+        let y = inset;
 
         cr.set_line_width(LINE_WIDTH);
         cr.set_line_cap(gtk::cairo::LineCap::Round);
 
-        cr.set_source_rgba(r, g, b, 0.20);
+        cr.set_source_rgba(r, g, b, 0.30);
         cr.move_to(start_x, y);
         cr.line_to(end_x, y);
         let _ = cr.stroke();

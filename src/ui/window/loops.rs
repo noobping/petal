@@ -20,7 +20,7 @@ use adw::{
 };
 use std::cell::Cell;
 use std::rc::Rc;
-use std::time::Instant;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use std::{
     sync::{atomic::AtomicU32, atomic::Ordering, mpsc, Arc},
     thread,
@@ -274,10 +274,23 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
             }
         }
 
-        track_progress.set_fraction(runtime.progress_fraction(playback_clock.playback_cursor_ms()));
+        let live_now_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64;
+        let cursor_ms = progress_cursor_ms(&playback_clock, live_now_ms);
+        track_progress.set_fraction(runtime.progress_fraction(cursor_ms));
 
         glib::ControlFlow::Continue
     });
+}
+
+fn progress_cursor_ms(clock: &PlaybackClock, live_now_ms: u64) -> u64 {
+    if clock.is_live_playback() {
+        live_now_ms
+    } else {
+        clock.playback_cursor_ms()
+    }
 }
 
 pub(super) fn spawn_viz_loop(
@@ -385,6 +398,8 @@ fn apply_cover_bytes(
 #[cfg(test)]
 mod tests {
     use super::super::state::{RuntimeState, SharedTrack};
+    use super::progress_cursor_ms;
+    use crate::listen::PlaybackClock;
     use crate::meta::TrackInfo;
     use std::{cell::RefCell, rc::Rc};
 
@@ -407,5 +422,16 @@ mod tests {
 
         assert!(current_track.borrow().is_none());
         assert!(!runtime.is_latest_cover("cover"));
+    }
+
+    #[test]
+    fn live_progress_uses_wall_time_while_buffered_progress_uses_its_cursor() {
+        let clock = PlaybackClock::new();
+        clock.set_playback_cursor_ms(12_000);
+
+        assert_eq!(progress_cursor_ms(&clock, 99_000), 12_000);
+
+        clock.set_live_playback(true);
+        assert_eq!(progress_cursor_ms(&clock, 99_000), 99_000);
     }
 }

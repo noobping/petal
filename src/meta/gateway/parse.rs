@@ -12,7 +12,13 @@ pub(super) struct ParsedTrackBatch {
 
 pub(super) fn parse_track_batch(d: &Value) -> Option<ParsedTrackBatch> {
     let payload: GatewaySongPayload = serde_json::from_value(d.clone()).ok()?;
-    let current_start_ms = parse_rfc3339_timestamp_ms(&payload.start_time)?;
+    // Despite its name, the gateway's `startTime` marks the boundary where
+    // the next song starts: the end of the current song. Convert it to the
+    // current song's actual start so playback-cursor and progress math agree
+    // with the play-history timestamps.
+    let current_end_ms = parse_rfc3339_timestamp_ms(&payload.next_start_time)?;
+    let current_duration_ms = u64::from(payload.song.duration_secs()).saturating_mul(1_000);
+    let current_start_ms = current_end_ms.saturating_sub(current_duration_ms);
 
     let current = build_track_info(&payload.song, current_start_ms);
     let mut history = Vec::with_capacity(payload.last_played.len());
@@ -50,7 +56,7 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn parses_current_track_album_and_backfills_last_played() {
+    fn converts_current_end_boundary_and_backfills_last_played() {
         let payload = json!({
             "song": {
                 "title": "Current",
@@ -73,6 +79,7 @@ mod tests {
         assert_eq!(parsed.current.album, "Album");
         assert_eq!(parsed.current.artist, "Artist");
         assert_eq!(parsed.current.title, "Current");
+        assert_eq!(parsed.current.start_time_ms, 1_735_689_600_000);
         assert_eq!(parsed.history.len(), 1);
         assert_eq!(parsed.history[0].album, "Prev Album");
         assert_eq!(

@@ -12,7 +12,7 @@ pub(super) struct GatewayHello {
 pub(super) struct GatewaySongPayload {
     pub song: Song,
     #[serde(rename = "startTime")]
-    pub start_time: String,
+    pub next_start_time: String,
     #[serde(rename = "lastPlayed", default)]
     pub last_played: Vec<Song>,
 }
