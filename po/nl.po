@@ -195,9 +195,6 @@ msgstr "Controleren op updates"
 msgid "Cancel update"
 msgstr "Update annuleren"
 
-msgid "Update progress"
-msgstr "Updatevoortgang"
-
 msgid "Couldn't check for updates"
 msgstr "Kon niet controleren op updates"
 
@@ -242,9 +239,6 @@ msgstr "Controleren op updates"
 
 msgid "Downloading update"
 msgstr "Update downloaden"
-
-msgid "Install update"
-msgstr "Update installeren"
 
 msgid "Update ready"
 msgstr "Update gereed"

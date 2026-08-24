@@ -195,9 +195,6 @@ msgstr "アップデートを確認"
 msgid "Cancel update"
 msgstr "アップデートをキャンセル"
 
-msgid "Update progress"
-msgstr "アップデートの進行状況"
-
 msgid "Couldn't check for updates"
 msgstr "アップデートを確認できませんでした"
 
@@ -242,9 +239,6 @@ msgstr "アップデートを確認中"
 
 msgid "Downloading update"
 msgstr "アップデートをダウンロード中"
-
-msgid "Install update"
-msgstr "アップデートをインストール"
 
 msgid "Update ready"
 msgstr "アップデートの準備ができました"

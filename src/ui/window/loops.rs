@@ -34,7 +34,7 @@ use super::super::volume::VolumeUi;
 use super::super::{
     controls::{MediaControlEvent, NowPlaying},
     cover,
-    progress::TrackProgress,
+    progress::TitlebarProgress,
     viz::VizHandle,
 };
 #[cfg(target_os = "linux")]
@@ -70,7 +70,7 @@ pub(super) struct UiUpdateLoopCtx {
     pub(super) current_track: SharedTrack,
     pub(super) metadata_setter: MetadataSetter,
     pub(super) playback_clock: Arc<PlaybackClock>,
-    pub(super) track_progress: TrackProgress,
+    pub(super) titlebar_progress: TitlebarProgress,
     #[cfg(target_os = "linux")]
     pub(super) volume_ui: VolumeUi,
     #[cfg(target_os = "linux")]
@@ -102,7 +102,7 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
         current_track,
         metadata_setter,
         playback_clock,
-        track_progress,
+        titlebar_progress,
         #[cfg(target_os = "linux")]
         volume_ui,
         #[cfg(target_os = "linux")]
@@ -279,7 +279,7 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
             .unwrap_or_default()
             .as_millis() as u64;
         let cursor_ms = progress_cursor_ms(&playback_clock, live_now_ms);
-        track_progress.set_fraction(runtime.progress_fraction(cursor_ms));
+        titlebar_progress.set_track_fraction(runtime.progress_fraction(cursor_ms));
 
         glib::ControlFlow::Continue
     });

@@ -195,9 +195,6 @@ msgstr "Buscar actualizaciones"
 msgid "Cancel update"
 msgstr "Cancelar actualización"
 
-msgid "Update progress"
-msgstr "Progreso de la actualización"
-
 msgid "Couldn't check for updates"
 msgstr "No se pudieron buscar actualizaciones"
 
@@ -242,9 +239,6 @@ msgstr "Buscando actualizaciones"
 
 msgid "Downloading update"
 msgstr "Descargando actualización"
-
-msgid "Install update"
-msgstr "Instalar actualización"
 
 msgid "Update ready"
 msgstr "Actualización lista"

@@ -196,9 +196,6 @@ msgstr ""
 msgid "Cancel update"
 msgstr ""
 
-msgid "Update progress"
-msgstr ""
-
 msgid "Couldn't check for updates"
 msgstr ""
 
@@ -242,9 +239,6 @@ msgid "Checking for updates"
 msgstr ""
 
 msgid "Downloading update"
-msgstr ""
-
-msgid "Install update"
 msgstr ""
 
 msgid "Update ready"

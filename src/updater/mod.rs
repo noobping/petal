@@ -1,7 +1,5 @@
-use adw::{
-    gtk::{Button, DrawingArea},
-    WindowTitle,
-};
+use crate::ui::TitlebarProgress;
+use adw::{gtk::Button, WindowTitle};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -16,9 +14,7 @@ pub(crate) struct UpdateUi {
     pub(crate) update_title_override: Rc<Cell<bool>>,
     pub(crate) play_button: Button,
     pub(crate) pause_button: Button,
-    pub(crate) update_button: Button,
-    pub(crate) update_progress_area: DrawingArea,
-    pub(crate) update_progress: Rc<Cell<Option<f64>>>,
+    pub(crate) titlebar_progress: TitlebarProgress,
 }
 
 mod common;

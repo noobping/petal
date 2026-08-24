@@ -3,6 +3,8 @@ mod controls;
 mod cover;
 mod discord;
 mod progress;
+#[cfg(target_os = "windows")]
+pub(crate) use progress::TitlebarProgress;
 mod viz;
 #[cfg(target_os = "linux")]
 mod volume;

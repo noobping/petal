@@ -88,12 +88,6 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         pause_button,
         #[cfg(target_os = "linux")]
         volume_button,
-        #[cfg(target_os = "windows")]
-        update_button,
-        #[cfg(target_os = "windows")]
-        update_progress_area,
-        #[cfg(target_os = "windows")]
-        update_progress,
         menu,
         art_picture,
         art_popover,
@@ -101,7 +95,7 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         css_provider,
         viz,
         viz_handle,
-        track_progress,
+        titlebar_progress,
     } = layout::build_window_layout(app, options.pause_resume_enabled());
 
     let (controls, ctrl_rx) = actions::build_actions(
@@ -158,9 +152,7 @@ pub fn build_ui(app: &Application, options: UiOptions) {
                 update_title_override: update_title_override.clone(),
                 play_button: play_button.clone(),
                 pause_button: pause_button.clone(),
-                update_button: update_button.clone(),
-                update_progress_area: update_progress_area.clone(),
-                update_progress: update_progress.clone(),
+                titlebar_progress: titlebar_progress.clone(),
             },
         );
 
@@ -199,7 +191,7 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         current_track,
         metadata_setter,
         playback_clock,
-        track_progress,
+        titlebar_progress,
         #[cfg(target_os = "linux")]
         volume_ui,
         #[cfg(target_os = "linux")]

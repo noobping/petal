@@ -174,14 +174,6 @@ impl UpdaterController {
         }
         window.add_action(&self.inner.cancel_action);
         self.set_update_menu_options(true, false);
-
-        {
-            let controller = self.clone();
-            self.inner
-                .ui
-                .update_button
-                .connect_clicked(move |_| controller.begin_install_flow());
-        }
     }
 
     fn start_check(&self, mode: CheckMode) {
@@ -189,10 +181,10 @@ impl UpdaterController {
             return;
         }
 
-        {
+        let ready_release = {
             let mut state = self.inner.state.borrow_mut();
             match &mut *state {
-                UpdateState::Idle => {}
+                UpdateState::Idle => None,
                 UpdateState::Checking {
                     mode: existing_mode,
                     ..
@@ -217,15 +209,19 @@ impl UpdaterController {
                 }
                 UpdateState::Ready { release, download } => {
                     if cached_download_matches_release(download, &release.asset) {
-                        self.present_ready(release);
-                        return;
+                        Some(release.clone())
+                    } else {
+                        platform::cleanup_download(download);
+                        *state = UpdateState::Idle;
+                        None
                     }
-
-                    platform::cleanup_download(download);
-                    *state = UpdateState::Idle;
                 }
                 UpdateState::Installing => return,
             }
+        };
+        if let Some(release) = ready_release {
+            self.handle_ready_update(&release);
+            return;
         }
 
         let run_id = self.next_run_id();
@@ -541,10 +537,6 @@ impl UpdaterController {
     fn present_checking(&self) {
         self.show_update_ui();
         self.set_update_progress(Some(0.0));
-        self.inner
-            .ui
-            .update_button
-            .set_tooltip_text(Some(&gettext("Checking for updates")));
         self.set_update_title(
             gettext("Checking for updates"),
             gettext(platform::update_check_body()),
@@ -553,10 +545,6 @@ impl UpdaterController {
 
     fn present_download(&self, release: &SelectedRelease, downloaded: u64) {
         self.show_update_ui();
-        self.inner
-            .ui
-            .update_button
-            .set_tooltip_text(Some(&gettext("Downloading update")));
         self.update_download_progress(release, downloaded);
     }
 
@@ -582,10 +570,6 @@ impl UpdaterController {
     fn present_ready(&self, release: &SelectedRelease) {
         self.show_update_ui();
         self.set_update_progress(Some(1.0));
-        self.inner
-            .ui
-            .update_button
-            .set_tooltip_text(Some(&gettext("Install update")));
         self.set_update_title(
             gettext("Update ready"),
             format!(
@@ -633,7 +617,6 @@ impl UpdaterController {
         self.inner.ui.update_title_override.set(true);
         self.inner.ui.play_button.set_visible(false);
         self.inner.ui.pause_button.set_visible(false);
-        self.inner.ui.update_button.set_visible(true);
         self.set_update_menu_options(false, true);
     }
 
@@ -646,7 +629,7 @@ impl UpdaterController {
 
     fn restore_transport_controls(&self) {
         self.inner.ui.update_active.set(false);
-        self.inner.ui.update_button.set_visible(false);
+        self.set_update_progress(None);
         if self.inner.ui.playback_playing.get() {
             self.inner.ui.play_button.set_visible(false);
             self.inner.ui.pause_button.set_visible(true);
@@ -670,9 +653,8 @@ impl UpdaterController {
     fn set_update_progress(&self, fraction: Option<f64>) {
         self.inner
             .ui
-            .update_progress
-            .set(fraction.map(|fraction| fraction.clamp(0.0, 1.0)));
-        self.inner.ui.update_progress_area.queue_draw();
+            .titlebar_progress
+            .set_update_fraction(fraction);
     }
 
     fn set_update_menu_options(&self, check_enabled: bool, cancel_enabled: bool) {

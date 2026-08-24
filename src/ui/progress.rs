@@ -1,30 +1,60 @@
 use adw::gtk::{self, prelude::*};
-use std::{cell::Cell, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
 const PROGRESS_HEIGHT: i32 = 3;
 const LINE_WIDTH: f64 = 2.0;
 
 #[derive(Clone)]
-pub(super) struct TrackProgress {
+pub(crate) struct TitlebarProgress {
     area: gtk::DrawingArea,
-    fraction: Rc<Cell<Option<f64>>>,
+    state: Rc<RefCell<ProgressState>>,
 }
 
-impl TrackProgress {
-    pub(super) fn set_fraction(&self, fraction: Option<f64>) {
+#[derive(Default)]
+struct ProgressState {
+    track_fraction: Option<f64>,
+    update_fraction: Option<f64>,
+}
+
+impl ProgressState {
+    fn visible_fraction(&self) -> Option<f64> {
+        self.update_fraction.or(self.track_fraction)
+    }
+}
+
+impl TitlebarProgress {
+    pub(super) fn set_track_fraction(&self, fraction: Option<f64>) {
+        self.set_fraction(fraction, false);
+    }
+
+    #[cfg(target_os = "windows")]
+    pub(crate) fn set_update_fraction(&self, fraction: Option<f64>) {
+        self.set_fraction(fraction, true);
+    }
+
+    fn set_fraction(&self, fraction: Option<f64>, is_update: bool) {
         let fraction = fraction.map(|value| value.clamp(0.0, 1.0));
-        if self.fraction.get() == fraction {
+        let mut state = self.state.borrow_mut();
+        let previous = state.visible_fraction();
+        if is_update {
+            state.update_fraction = fraction;
+        } else {
+            state.track_fraction = fraction;
+        }
+        let current = state.visible_fraction();
+        drop(state);
+
+        if previous == current {
             return;
         }
 
-        self.fraction.set(fraction);
         self.area.queue_draw();
     }
 }
 
-pub(super) fn make_track_progress() -> (gtk::DrawingArea, TrackProgress) {
-    let fraction = Rc::new(Cell::new(None));
-    let fraction_for_draw = fraction.clone();
+pub(super) fn make_titlebar_progress() -> (gtk::DrawingArea, TitlebarProgress) {
+    let state = Rc::new(RefCell::new(ProgressState::default()));
+    let state_for_draw = state.clone();
 
     let area = gtk::DrawingArea::new();
     area.set_can_target(false);
@@ -33,10 +63,10 @@ pub(super) fn make_track_progress() -> (gtk::DrawingArea, TrackProgress) {
     area.set_valign(gtk::Align::End);
     area.set_content_height(PROGRESS_HEIGHT);
     area.set_height_request(PROGRESS_HEIGHT);
-    area.add_css_class("track-progress");
+    area.add_css_class("titlebar-progress");
 
     area.set_draw_func(move |area, cr, width, height| {
-        let Some(fraction) = fraction_for_draw.get() else {
+        let Some(fraction) = state_for_draw.borrow().visible_fraction() else {
             return;
         };
 
@@ -68,9 +98,9 @@ pub(super) fn make_track_progress() -> (gtk::DrawingArea, TrackProgress) {
         }
     });
 
-    let progress = TrackProgress {
+    let progress = TitlebarProgress {
         area: area.clone(),
-        fraction,
+        state,
     };
     (area, progress)
 }
@@ -82,4 +112,27 @@ fn widget_css_color(widget: &gtk::Widget) -> (f64, f64, f64) {
         color.green() as f64,
         color.blue() as f64,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ProgressState;
+
+    #[test]
+    fn update_progress_temporarily_overrides_the_latest_track_progress() {
+        let mut state = ProgressState {
+            track_fraction: Some(0.25),
+            update_fraction: None,
+        };
+        assert_eq!(state.visible_fraction(), Some(0.25));
+
+        state.update_fraction = Some(0.6);
+        assert_eq!(state.visible_fraction(), Some(0.6));
+
+        state.track_fraction = Some(0.4);
+        assert_eq!(state.visible_fraction(), Some(0.6));
+
+        state.update_fraction = None;
+        assert_eq!(state.visible_fraction(), Some(0.4));
+    }
 }
