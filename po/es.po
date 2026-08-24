@@ -269,3 +269,30 @@ msgstr "Se separaron las funciones experimentales de las funciones estables."
 
 msgid "Volume control added."
 msgstr "Se añadió el control de volumen."
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Show karaoke"
+msgstr "Mostrar karaoke"
+
+msgid "Finding lyrics…"
+msgstr "Buscando la letra…"
+
+msgid "Just a moment"
+msgstr "Un momento"
+
+msgid "No synchronized lyrics"
+msgstr "No hay letra sincronizada"
+
+msgid "This song can still be your tiny concert."
+msgstr "Esta canción aún puede ser tu pequeño concierto."
+
+msgid "Couldn't load lyrics"
+msgstr "No se pudo cargar la letra"
+
+msgid "Try again in a moment."
+msgstr "Inténtalo de nuevo en un momento."
+
+msgid "Lyrics by LRCLIB"
+msgstr "Letra de LRCLIB"

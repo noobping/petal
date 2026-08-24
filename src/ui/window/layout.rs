@@ -14,7 +14,7 @@ use std::{
 
 #[cfg(target_os = "linux")]
 use super::super::volume;
-use super::super::{cover, progress, viz};
+use super::super::{cover, karaoke, progress, viz};
 use super::state::{SharedFlag, SharedTitle};
 use super::APP_NAME;
 
@@ -37,6 +37,8 @@ pub(super) struct WindowLayout {
     pub(super) menu: Menu,
     pub(super) art_picture: Picture,
     pub(super) art_popover: Popover,
+    pub(super) art_stack: gtk::Stack,
+    pub(super) karaoke_view: karaoke::KaraokeView,
     pub(super) style_manager: StyleManager,
     pub(super) css_provider: gtk::CssProvider,
     pub(super) viz: gtk::DrawingArea,
@@ -123,11 +125,21 @@ pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool)
         .focusable(false)
         .sensitive(false)
         .build();
+    let karaoke_view = karaoke::KaraokeView::new();
+    let art_stack = gtk::Stack::new();
+    art_stack.set_hhomogeneous(true);
+    art_stack.set_vhomogeneous(true);
+    art_stack.set_transition_duration(190);
+    art_stack.set_transition_type(gtk::StackTransitionType::Crossfade);
+    art_stack.add_named(&art_picture, Some("art"));
+    art_stack.add_named(karaoke_view.widget(), Some("karaoke"));
+    art_stack.set_visible_child_name("art");
+
     let art_popover = Popover::builder()
         .has_arrow(true)
         .position(gtk::PositionType::Bottom)
         .autohide(true)
-        .child(&art_picture)
+        .child(&art_stack)
         .build();
     art_popover.set_parent(&header);
     art_popover.add_css_class("cover-tint");
@@ -136,7 +148,9 @@ pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool)
     {
         let picture = art_picture.clone();
         let art = art_popover.clone();
+        let stack = art_stack.clone();
         title_click.connect_released(move |_, _, _, _| {
+            stack.set_visible_child_name("art");
             if art.is_visible() {
                 art.popdown();
             } else if picture.paintable().is_some() {
@@ -189,6 +203,8 @@ pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool)
         menu,
         art_picture,
         art_popover,
+        art_stack,
+        karaoke_view,
         style_manager,
         css_provider,
         viz,

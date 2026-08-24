@@ -8,9 +8,10 @@ use crate::station::Station;
 #[cfg(target_os = "linux")]
 use crate::volume::{self, VolumeCommand};
 
+use adw::gtk::gio::SimpleAction;
 #[cfg(target_os = "windows")]
 use adw::prelude::ApplicationExt;
-use adw::prelude::GtkWindowExt;
+use adw::prelude::{ActionMapExt, GtkWindowExt, PopoverExt, WidgetExt};
 use adw::Application;
 use std::{cell::RefCell, rc::Rc, sync::mpsc};
 
@@ -91,12 +92,37 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         menu,
         art_picture,
         art_popover,
+        art_stack,
+        karaoke_view,
         style_manager,
         css_provider,
         viz,
         viz_handle,
         titlebar_progress,
     } = layout::build_window_layout(app, options.pause_resume_enabled());
+
+    let karaoke_action = SimpleAction::new("karaoke", None);
+    karaoke_action.set_enabled(false);
+    {
+        let current_track = current_track.clone();
+        let art_popover = art_popover.clone();
+        let art_stack = art_stack.clone();
+        karaoke_action.connect_activate(move |_, _| {
+            if current_track.borrow().is_none() {
+                return;
+            }
+
+            let karaoke_is_open = art_popover.is_visible()
+                && art_stack.visible_child_name().as_deref() == Some("karaoke");
+            if karaoke_is_open {
+                art_popover.popdown();
+            } else {
+                art_stack.set_visible_child_name("karaoke");
+                art_popover.popup();
+            }
+        });
+    }
+    window.add_action(&karaoke_action);
 
     let (controls, ctrl_rx) = actions::build_actions(
         &window,
@@ -182,6 +208,9 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         update_title_override,
         art_picture,
         art_popover,
+        art_stack,
+        karaoke_view,
+        karaoke_action,
         style_manager,
         css_provider,
         ui_rx,

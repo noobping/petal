@@ -18,6 +18,7 @@ pub fn populate_menu(
     meta: &Rc<Meta>,
 ) {
     menu.append(Some(&gettext("Copy current track")), Some("win.copy"));
+    menu.append(Some(&gettext("Karaoke")), Some("win.karaoke"));
 
     for station in [Station::Jpop, Station::Kpop] {
         register_station_action(station, playback_playing, window, radio, meta);

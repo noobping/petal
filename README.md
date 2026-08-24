@@ -14,6 +14,8 @@ The application uses a compact, titlebar-style layout that displays the current 
 
 When album or artist artwork is available, a dominant color is extracted and used to select the appropriate GNOME light or dark appearance. If no artwork is available, the default GNOME appearance is used.
 
+The title popover also has line-synchronized karaoke lyrics provided by [LRCLIB](https://lrclib.net). Open karaoke from the main menu or with `Ctrl+L`; clicking the title continues to show the current artwork.
+
 The background includes subtle, animated sound bars that respond to the music. Their color adapts to the extracted palette while remaining unobtrusive. Text readability is preserved using a soft overlay behind the title and subtitle.
 
 ## Installation
@@ -52,6 +54,7 @@ Experimental builds compiled with `--features experimental` also expose `-p`, `-
 
 Keyboard shortcuts:
 
+- `Ctrl+L`: open karaoke lyrics
 - `Ctrl+,`: open Preferences
 - `Ctrl+?` or `F1`: open Keyboard Shortcuts
 

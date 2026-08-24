@@ -192,6 +192,7 @@ fn add_accels(app: &Application) {
         ("win.show-help-overlay", &["F1", "<primary>question"]),
         ("win.preferences", &["<primary>comma"]),
         ("win.copy", &["<primary>c"]),
+        ("win.karaoke", &["<primary>l"]),
         ("win.jpop", &["<primary>j"]),
         ("win.kpop", &["<primary>k"]),
         ("win.quit", &["<primary>q"]),

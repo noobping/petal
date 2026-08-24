@@ -299,6 +299,7 @@ mod tests {
     fn track(title: &str, start_time_ms: u64, duration_secs: u32) -> TrackInfo {
         TrackInfo {
             artist: "artist".into(),
+            primary_artist: "artist".into(),
             title: title.into(),
             album: "album".into(),
             album_cover: None,

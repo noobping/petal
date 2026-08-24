@@ -270,3 +270,30 @@ msgstr ""
 
 msgid "Volume control added."
 msgstr ""
+
+msgid "Karaoke"
+msgstr ""
+
+msgid "Show karaoke"
+msgstr ""
+
+msgid "Finding lyrics…"
+msgstr ""
+
+msgid "Just a moment"
+msgstr ""
+
+msgid "No synchronized lyrics"
+msgstr ""
+
+msgid "This song can still be your tiny concert."
+msgstr ""
+
+msgid "Couldn't load lyrics"
+msgstr ""
+
+msgid "Try again in a moment."
+msgstr ""
+
+msgid "Lyrics by LRCLIB"
+msgstr ""

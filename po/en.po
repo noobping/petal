@@ -269,3 +269,30 @@ msgstr "Separate experimental features from stable features."
 
 msgid "Volume control added."
 msgstr "Volume control added."
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Show karaoke"
+msgstr "Show karaoke"
+
+msgid "Finding lyrics…"
+msgstr "Finding lyrics…"
+
+msgid "Just a moment"
+msgstr "Just a moment"
+
+msgid "No synchronized lyrics"
+msgstr "No synchronized lyrics"
+
+msgid "This song can still be your tiny concert."
+msgstr "This song can still be your tiny concert."
+
+msgid "Couldn't load lyrics"
+msgstr "Couldn't load lyrics"
+
+msgid "Try again in a moment."
+msgstr "Try again in a moment."
+
+msgid "Lyrics by LRCLIB"
+msgstr "Lyrics by LRCLIB"

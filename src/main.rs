@@ -7,6 +7,7 @@ mod http_source;
 mod listen;
 mod locale;
 mod log;
+mod lyrics;
 mod meta;
 mod preferences;
 mod station;

@@ -169,6 +169,7 @@ mod tests {
     fn track(start_time_ms: u64, duration_secs: u32, album: &str) -> TrackInfo {
         TrackInfo {
             artist: "artist".into(),
+            primary_artist: "artist".into(),
             title: format!("title-{start_time_ms}"),
             album: album.into(),
             album_cover: None,
@@ -181,6 +182,7 @@ mod tests {
     fn titled_track(start_time_ms: u64, duration_secs: u32, title: &str, album: &str) -> TrackInfo {
         TrackInfo {
             artist: "artist".into(),
+            primary_artist: "artist".into(),
             title: title.into(),
             album: album.into(),
             album_cover: None,

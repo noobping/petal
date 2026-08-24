@@ -36,6 +36,12 @@ pub fn install_shortcuts_overlay(window: &gtk::ApplicationWindow) {
                 <property name="accelerator">&lt;Primary&gt;c</property>
               </object>
             </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="title">{show_karaoke}</property>
+                <property name="accelerator">&lt;Primary&gt;l</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
@@ -101,6 +107,7 @@ pub fn install_shortcuts_overlay(window: &gtk::ApplicationWindow) {
         play_or_pause = esc(gettext("Play or pause")),
         stop_playback = esc(gettext("Stop playback")),
         copy_current_track = esc(gettext("Copy current track")),
+        show_karaoke = esc(gettext("Show karaoke")),
         stations = esc(gettext("Stations")),
         play_jpop = esc(gettext("Play J-POP")),
         play_kpop = esc(gettext("Play K-POP")),

@@ -269,3 +269,30 @@ msgstr "Experimentele functies gescheiden van stabiele functies."
 
 msgid "Volume control added."
 msgstr "Volumeregeling toegevoegd."
+
+msgid "Karaoke"
+msgstr "Karaoke"
+
+msgid "Show karaoke"
+msgstr "Karaoke tonen"
+
+msgid "Finding lyrics…"
+msgstr "Songtekst zoeken…"
+
+msgid "Just a moment"
+msgstr "Even geduld"
+
+msgid "No synchronized lyrics"
+msgstr "Geen gesynchroniseerde songtekst"
+
+msgid "This song can still be your tiny concert."
+msgstr "Dit nummer kan nog steeds je miniconcert zijn."
+
+msgid "Couldn't load lyrics"
+msgstr "Kon de songtekst niet laden"
+
+msgid "Try again in a moment."
+msgstr "Probeer het zo nog eens."
+
+msgid "Lyrics by LRCLIB"
+msgstr "Songtekst van LRCLIB"

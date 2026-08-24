@@ -269,3 +269,30 @@ msgstr "実験的な機能を安定版の機能から分離しました。"
 
 msgid "Volume control added."
 msgstr "音量コントロールを追加しました。"
+
+msgid "Karaoke"
+msgstr "カラオケ"
+
+msgid "Show karaoke"
+msgstr "カラオケを表示"
+
+msgid "Finding lyrics…"
+msgstr "歌詞を検索中…"
+
+msgid "Just a moment"
+msgstr "少々お待ちください"
+
+msgid "No synchronized lyrics"
+msgstr "同期歌詞がありません"
+
+msgid "This song can still be your tiny concert."
+msgstr "この曲で小さなコンサートはまだ楽しめます。"
+
+msgid "Couldn't load lyrics"
+msgstr "歌詞を読み込めませんでした"
+
+msgid "Try again in a moment."
+msgstr "しばらくしてからもう一度お試しください。"
+
+msgid "Lyrics by LRCLIB"
+msgstr "歌詞提供：LRCLIB"

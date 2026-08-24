@@ -1,5 +1,6 @@
 use crate::listen::PlaybackClock;
 use crate::log::{is_verbose, now_string};
+use crate::lyrics::{self, LyricCue, LyricsRequest, LyricsResult};
 use crate::ui::discord::Discord;
 
 #[cfg(target_os = "linux")]
@@ -11,9 +12,9 @@ use adw::{
     gtk::{
         self,
         gdk::{gdk_pixbuf::Pixbuf, Texture},
-        gio::{Cancellable, MemoryInputStream},
+        gio::{Cancellable, MemoryInputStream, SimpleAction},
         prelude::WidgetExt,
-        ApplicationWindow, Picture, Popover,
+        ApplicationWindow, Picture, Popover, Stack,
     },
     prelude::PopoverExt,
     StyleManager, WindowTitle,
@@ -34,6 +35,7 @@ use super::super::volume::VolumeUi;
 use super::super::{
     controls::{MediaControlEvent, NowPlaying},
     cover,
+    karaoke::KaraokeView,
     progress::TitlebarProgress,
     viz::VizHandle,
 };
@@ -53,6 +55,16 @@ const VIZ_FALL_LERP: f32 = 0.18;
 const VIZ_MAX_RISE_PER_FRAME: f32 = 0.040;
 const VIZ_MAX_FALL_PER_FRAME: f32 = 0.028;
 
+type LyricsFetchResult = (u64, LyricsResult);
+
+enum LyricsLoadState {
+    Idle,
+    Loading,
+    Ready(Vec<LyricCue>),
+    Missing,
+    Error,
+}
+
 pub(super) struct UiUpdateLoopCtx {
     pub(super) window: ApplicationWindow,
     pub(super) win_title: WindowTitle,
@@ -61,6 +73,9 @@ pub(super) struct UiUpdateLoopCtx {
     pub(super) update_title_override: Rc<Cell<bool>>,
     pub(super) art_picture: Picture,
     pub(super) art_popover: Popover,
+    pub(super) art_stack: Stack,
+    pub(super) karaoke_view: KaraokeView,
+    pub(super) karaoke_action: SimpleAction,
     pub(super) style_manager: StyleManager,
     pub(super) css_provider: gtk::CssProvider,
     pub(super) ui_rx: mpsc::Receiver<UiEvent>,
@@ -93,6 +108,9 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
         update_title_override,
         art_picture,
         art_popover,
+        art_stack,
+        karaoke_view,
+        karaoke_action,
         style_manager,
         css_provider,
         ui_rx,
@@ -117,6 +135,13 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
     } = ctx;
 
     let mut runtime = RuntimeState::new(current_track);
+    let (lyrics_tx, lyrics_rx) = mpsc::channel::<LyricsFetchResult>();
+    let mut lyrics_generation = 0_u64;
+    let mut lyrics_request: Option<LyricsRequest> = None;
+    let mut lyrics_start_time_ms: Option<u64> = None;
+    let mut lyrics_state = LyricsLoadState::Idle;
+    let mut rendered_cue_index: Option<Option<usize>> = None;
+    let mut karaoke_was_visible = false;
 
     let mut discord = Discord::new(discord_enabled);
     let mut was_playing = playback_playing.get();
@@ -182,7 +207,23 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                     }
                     runtime.clear_track();
                     runtime.set_latest_cover_url(None);
-                    clear_art_ui(&art_picture, &art_popover, &style_manager, &css_provider);
+                    clear_art_ui(
+                        &art_picture,
+                        &art_popover,
+                        &art_stack,
+                        &style_manager,
+                        &css_provider,
+                    );
+                    art_popover.popdown();
+                    art_stack.set_visible_child_name("art");
+                    karaoke_action.set_enabled(false);
+                    lyrics_generation = lyrics_generation.wrapping_add(1);
+                    lyrics_request = None;
+                    lyrics_start_time_ms = None;
+                    lyrics_state = LyricsLoadState::Idle;
+                    rendered_cue_index = None;
+                    karaoke_was_visible = false;
+                    karaoke_view.show_loading();
                     (metadata_setter)(None);
                     let _ = discord.clear();
                     last_track = None;
@@ -192,13 +233,26 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                         &win_title,
                         &normal_title,
                         &update_title_override,
-                        &art_picture,
-                        &art_popover,
-                        &style_manager,
-                        &css_provider,
                         &mut runtime,
                         &metadata_setter,
                     );
+                    clear_art_ui(
+                        &art_picture,
+                        &art_popover,
+                        &art_stack,
+                        &style_manager,
+                        &css_provider,
+                    );
+                    art_popover.popdown();
+                    art_stack.set_visible_child_name("art");
+                    karaoke_action.set_enabled(false);
+                    lyrics_generation = lyrics_generation.wrapping_add(1);
+                    lyrics_request = None;
+                    lyrics_start_time_ms = None;
+                    lyrics_state = LyricsLoadState::Idle;
+                    rendered_cue_index = None;
+                    karaoke_was_visible = false;
+                    karaoke_view.show_loading();
                     let _ = discord.clear();
                     last_track = None;
                     if reason == UiResetReason::Stopped {
@@ -212,6 +266,13 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                         win_title.set_subtitle(&info.title);
                     }
                     runtime.set_track(&info);
+                    lyrics_generation = lyrics_generation.wrapping_add(1);
+                    lyrics_request = Some(LyricsRequest::from_track(&info));
+                    lyrics_start_time_ms = Some(info.start_time_ms);
+                    lyrics_state = LyricsLoadState::Idle;
+                    rendered_cue_index = None;
+                    karaoke_view.show_loading();
+                    karaoke_action.set_enabled(true);
 
                     if discord.is_enabled() && is_verbose() {
                         println!(
@@ -247,7 +308,13 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                             let _ = tx.send((url, result));
                         });
                     } else {
-                        clear_art_ui(&art_picture, &art_popover, &style_manager, &css_provider);
+                        clear_art_ui(
+                            &art_picture,
+                            &art_popover,
+                            &art_stack,
+                            &style_manager,
+                            &css_provider,
+                        );
                     }
                 }
             }
@@ -264,12 +331,46 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                         apply_cover_bytes(bytes_vec, &art_picture, &style_manager, &css_provider)
                     {
                         eprintln!("Failed to decode cover pixbuf: {err}");
-                        clear_art_ui(&art_picture, &art_popover, &style_manager, &css_provider);
+                        clear_art_ui(
+                            &art_picture,
+                            &art_popover,
+                            &art_stack,
+                            &style_manager,
+                            &css_provider,
+                        );
                     }
                 }
                 Err(err) => {
                     eprintln!("Failed to load cover bytes: {err}");
-                    clear_art_ui(&art_picture, &art_popover, &style_manager, &css_provider);
+                    clear_art_ui(
+                        &art_picture,
+                        &art_popover,
+                        &art_stack,
+                        &style_manager,
+                        &css_provider,
+                    );
+                }
+            }
+        }
+
+        for (generation, result) in lyrics_rx.try_iter() {
+            if generation != lyrics_generation {
+                continue;
+            }
+
+            rendered_cue_index = None;
+            match result {
+                LyricsResult::Found(cues) => {
+                    lyrics_state = LyricsLoadState::Ready(cues);
+                }
+                LyricsResult::Missing => {
+                    lyrics_state = LyricsLoadState::Missing;
+                    karaoke_view.show_missing();
+                }
+                LyricsResult::Error(error) => {
+                    eprintln!("Failed to load lyrics: {error}");
+                    lyrics_state = LyricsLoadState::Error;
+                    karaoke_view.show_error();
                 }
             }
         }
@@ -281,6 +382,48 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
         let cursor_ms = progress_cursor_ms(&playback_clock, live_now_ms);
         titlebar_progress.set_track_fraction(runtime.progress_fraction(cursor_ms));
 
+        let karaoke_is_visible = art_popover.is_visible()
+            && art_stack.visible_child_name().as_deref() == Some("karaoke");
+
+        // Reopening after a transient error is the passive view's retry action.
+        // Any click within the popover still closes it through layout's existing
+        // popover-wide gesture handler.
+        if karaoke_is_visible
+            && !karaoke_was_visible
+            && matches!(lyrics_state, LyricsLoadState::Error)
+        {
+            lyrics_state = LyricsLoadState::Idle;
+            karaoke_view.show_loading();
+        }
+
+        if karaoke_is_visible && matches!(lyrics_state, LyricsLoadState::Idle) {
+            if let Some(request) = lyrics_request.clone() {
+                let tx = lyrics_tx.clone();
+                let generation = lyrics_generation;
+                lyrics_state = LyricsLoadState::Loading;
+                karaoke_view.show_loading();
+                thread::spawn(move || {
+                    let result = lyrics::fetch(&request);
+                    let _ = tx.send((generation, result));
+                });
+            }
+        }
+
+        if karaoke_is_visible {
+            if let LyricsLoadState::Ready(cues) = &lyrics_state {
+                let active_index = lyrics_start_time_ms
+                    .and_then(|start_time_ms| active_lyric_index(cues, start_time_ms, cursor_ms));
+
+                if rendered_cue_index != Some(active_index) {
+                    let (previous, current, next) = lyric_context(cues, active_index);
+                    karaoke_view.show_lyrics(previous, current, next);
+                    rendered_cue_index = Some(active_index);
+                }
+            }
+        }
+
+        karaoke_was_visible = karaoke_is_visible;
+
         glib::ControlFlow::Continue
     });
 }
@@ -291,6 +434,35 @@ fn progress_cursor_ms(clock: &PlaybackClock, live_now_ms: u64) -> u64 {
     } else {
         clock.playback_cursor_ms()
     }
+}
+
+fn lyric_context(
+    cues: &[LyricCue],
+    active_index: Option<usize>,
+) -> (Option<&str>, &str, Option<&str>) {
+    let Some(index) = active_index else {
+        return (None, "", cues.first().map(|cue| cue.text.as_str()));
+    };
+
+    let previous = index
+        .checked_sub(1)
+        .and_then(|previous| cues.get(previous))
+        .map(|cue| cue.text.as_str());
+    let current = cues
+        .get(index)
+        .map(|cue| cue.text.as_str())
+        .unwrap_or_default();
+    let next = index
+        .checked_add(1)
+        .and_then(|next| cues.get(next))
+        .map(|cue| cue.text.as_str());
+    (previous, current, next)
+}
+
+fn active_lyric_index(cues: &[LyricCue], track_start_ms: u64, cursor_ms: u64) -> Option<usize> {
+    cursor_ms
+        .checked_sub(track_start_ms)
+        .and_then(|elapsed_ms| lyrics::active_cue_index(cues, elapsed_ms))
 }
 
 pub(super) fn spawn_viz_loop(
@@ -329,11 +501,14 @@ pub(super) fn spawn_viz_loop(
 fn clear_art_ui(
     art_picture: &Picture,
     art_popover: &Popover,
+    art_stack: &Stack,
     style_manager: &StyleManager,
     css_provider: &gtk::CssProvider,
 ) {
     art_picture.set_paintable(None::<&adw::gdk::Paintable>);
-    art_popover.popdown();
+    if art_stack.visible_child_name().as_deref() == Some("art") {
+        art_popover.popdown();
+    }
     style_manager.set_color_scheme(adw::ColorScheme::Default);
     cover::apply_cover_tint_css_clear(css_provider);
 }
@@ -342,10 +517,6 @@ fn reset_ui_state(
     win_title: &WindowTitle,
     normal_title: &SharedTitle,
     update_title_override: &Rc<Cell<bool>>,
-    art_picture: &Picture,
-    art_popover: &Popover,
-    style_manager: &StyleManager,
-    css_provider: &gtk::CssProvider,
     runtime: &mut RuntimeState,
     metadata_setter: &MetadataSetter,
 ) {
@@ -357,7 +528,6 @@ fn reset_ui_state(
     }
     runtime.clear_track();
     runtime.set_latest_cover_url(None);
-    clear_art_ui(art_picture, art_popover, style_manager, css_provider);
     (metadata_setter)(None);
 }
 
@@ -398,8 +568,9 @@ fn apply_cover_bytes(
 #[cfg(test)]
 mod tests {
     use super::super::state::{RuntimeState, SharedTrack};
-    use super::progress_cursor_ms;
+    use super::{active_lyric_index, lyric_context, progress_cursor_ms};
     use crate::listen::PlaybackClock;
+    use crate::lyrics::LyricCue;
     use crate::meta::TrackInfo;
     use std::{cell::RefCell, rc::Rc};
 
@@ -409,6 +580,7 @@ mod tests {
         let mut runtime = RuntimeState::new(current_track.clone());
         runtime.set_track(&TrackInfo {
             artist: "artist".into(),
+            primary_artist: "artist".into(),
             title: "title".into(),
             album: "album".into(),
             album_cover: Some("cover".into()),
@@ -433,5 +605,32 @@ mod tests {
 
         clock.set_live_playback(true);
         assert_eq!(progress_cursor_ms(&clock, 99_000), 99_000);
+    }
+
+    #[test]
+    fn karaoke_uses_track_relative_time_and_neighboring_cues() {
+        let cues = vec![
+            LyricCue {
+                start_ms: 1_000,
+                text: "First".into(),
+            },
+            LyricCue {
+                start_ms: 2_000,
+                text: "Second".into(),
+            },
+            LyricCue {
+                start_ms: 3_000,
+                text: "Third".into(),
+            },
+        ];
+
+        assert_eq!(active_lyric_index(&cues, 10_000, 9_999), None);
+        let active = active_lyric_index(&cues, 10_000, 12_500);
+        assert_eq!(active, Some(1));
+        assert_eq!(
+            lyric_context(&cues, active),
+            (Some("First"), "Second", Some("Third"))
+        );
+        assert_eq!(lyric_context(&cues, None), (None, "", Some("First")));
     }
 }

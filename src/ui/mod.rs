@@ -2,6 +2,7 @@ mod actions;
 mod controls;
 mod cover;
 mod discord;
+mod karaoke;
 mod progress;
 #[cfg(target_os = "windows")]
 pub(crate) use progress::TitlebarProgress;

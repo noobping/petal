@@ -35,16 +35,29 @@ impl Song {
     }
 
     pub fn display_artist(self: &Self) -> String {
-        if self.artists.is_empty() {
-            return "Unknown artist".to_owned();
-        }
-
-        self.artists
+        let artist = self
+            .artists
             .iter()
             .filter_map(|a| a.name.as_deref())
+            .filter(|name| !name.trim().is_empty())
             .map(str::to_owned)
             .collect::<Vec<_>>()
-            .join(", ")
+            .join(", ");
+
+        if artist.is_empty() {
+            "Unknown artist".to_owned()
+        } else {
+            artist
+        }
+    }
+
+    pub fn primary_artist(&self) -> String {
+        self.artists
+            .first()
+            .and_then(|artist| artist.name.as_deref())
+            .filter(|name| !name.trim().is_empty())
+            .map(str::to_owned)
+            .unwrap_or_else(|| self.display_artist())
     }
 
     pub fn display_album(self: &Self) -> String {
@@ -110,3 +123,39 @@ pub(super) const OP_DISPATCH: u8 = 1;
 pub(super) const OP_HEARTBEAT_ACK: u8 = 10;
 pub(super) const EVENT_TRACK_UPDATE: &str = "TRACK_UPDATE";
 pub(super) const EVENT_TRACK_UPDATE_REQUEST: &str = "TRACK_UPDATE_REQUEST";
+
+#[cfg(test)]
+mod tests {
+    use super::Song;
+
+    #[test]
+    fn primary_artist_uses_first_credit() {
+        let song: Song = serde_json::from_str(
+            r#"{
+                "title":"Test title",
+                "artists":[{"name":"First"},{"name":"Second"}],
+                "albums":[],
+                "duration":120
+            }"#,
+        )
+        .expect("song should deserialize");
+
+        assert_eq!(song.display_artist(), "First, Second");
+        assert_eq!(song.primary_artist(), "First");
+    }
+
+    #[test]
+    fn missing_primary_artist_falls_back_to_display_artist() {
+        let song: Song = serde_json::from_str(
+            r#"{
+                "title":"Test title",
+                "artists":[{"name":null},{"name":"Second"}],
+                "albums":[],
+                "duration":120
+            }"#,
+        )
+        .expect("song should deserialize");
+
+        assert_eq!(song.primary_artist(), "Second");
+    }
+}

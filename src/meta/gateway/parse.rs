@@ -41,6 +41,7 @@ pub(super) fn parse_track_batch(d: &Value) -> Option<ParsedTrackBatch> {
 pub(super) fn build_track_info(song: &Song, start_time_ms: u64) -> TrackInfo {
     TrackInfo {
         artist: song.display_artist(),
+        primary_artist: song.primary_artist(),
         title: song.display_title(),
         album: song.display_album(),
         album_cover: song.album_cover_url(),
@@ -78,6 +79,7 @@ mod tests {
         let parsed = parse_track_batch(&payload).expect("payload should parse");
         assert_eq!(parsed.current.album, "Album");
         assert_eq!(parsed.current.artist, "Artist");
+        assert_eq!(parsed.current.primary_artist, "Artist");
         assert_eq!(parsed.current.title, "Current");
         assert_eq!(parsed.current.start_time_ms, 1_735_689_600_000);
         assert_eq!(parsed.history.len(), 1);
