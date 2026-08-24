@@ -1,3 +1,4 @@
+use crate::listen::PlaybackClock;
 use crate::log::{is_verbose, now_string};
 use crate::ui::discord::Discord;
 
@@ -33,6 +34,7 @@ use super::super::volume::VolumeUi;
 use super::super::{
     controls::{MediaControlEvent, NowPlaying},
     cover,
+    progress::TrackProgress,
     viz::VizHandle,
 };
 #[cfg(target_os = "linux")]
@@ -67,6 +69,8 @@ pub(super) struct UiUpdateLoopCtx {
     pub(super) ctrl_rx: Option<mpsc::Receiver<MediaControlEvent>>,
     pub(super) current_track: SharedTrack,
     pub(super) metadata_setter: MetadataSetter,
+    pub(super) playback_clock: Arc<PlaybackClock>,
+    pub(super) track_progress: TrackProgress,
     #[cfg(target_os = "linux")]
     pub(super) volume_ui: VolumeUi,
     #[cfg(target_os = "linux")]
@@ -97,6 +101,8 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
         ctrl_rx,
         current_track,
         metadata_setter,
+        playback_clock,
+        track_progress,
         #[cfg(target_os = "linux")]
         volume_ui,
         #[cfg(target_os = "linux")]
@@ -267,6 +273,8 @@ pub(super) fn spawn_ui_update_loop(ctx: UiUpdateLoopCtx) {
                 }
             }
         }
+
+        track_progress.set_fraction(runtime.progress_fraction(playback_clock.playback_cursor_ms()));
 
         glib::ControlFlow::Continue
     });

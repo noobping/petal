@@ -70,9 +70,10 @@ pub fn build_ui(app: &Application, options: UiOptions) {
     let station = options.station;
     let radio = Listen::new(station);
     let spectrum_bits = radio.spectrum_bars();
+    let playback_clock = radio.playback_clock();
 
     let (ui_tx, ui_rx) = mpsc::channel::<UiEvent>();
-    let meta = Meta::new(station, ui_tx.clone(), radio.playback_clock());
+    let meta = Meta::new(station, ui_tx.clone(), playback_clock.clone());
     let (cover_tx, cover_rx) = mpsc::channel::<CoverFetchResult>();
     let current_track: SharedTrack = Rc::new(RefCell::new(None));
 
@@ -100,6 +101,7 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         css_provider,
         viz,
         viz_handle,
+        track_progress,
     } = layout::build_window_layout(app, options.pause_resume_enabled());
 
     let (controls, ctrl_rx) = actions::build_actions(
@@ -196,6 +198,8 @@ pub fn build_ui(app: &Application, options: UiOptions) {
         ctrl_rx,
         current_track,
         metadata_setter,
+        playback_clock,
+        track_progress,
         #[cfg(target_os = "linux")]
         volume_ui,
         #[cfg(target_os = "linux")]

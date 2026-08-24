@@ -98,23 +98,51 @@ pub enum UiEvent {
 
 pub(super) struct RuntimeState {
     current_track: SharedTrack,
+    track_timing: Option<TrackTiming>,
     latest_cover_url: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct TrackTiming {
+    start_time_ms: u64,
+    duration_ms: u64,
+}
+
+impl TrackTiming {
+    fn fraction_at(self, cursor_ms: u64) -> Option<f64> {
+        if self.duration_ms == 0 {
+            return None;
+        }
+
+        let elapsed_ms = cursor_ms.saturating_sub(self.start_time_ms);
+        Some((elapsed_ms as f64 / self.duration_ms as f64).clamp(0.0, 1.0))
+    }
 }
 
 impl RuntimeState {
     pub(super) fn new(current_track: SharedTrack) -> Self {
         Self {
             current_track,
+            track_timing: None,
             latest_cover_url: None,
         }
     }
 
-    pub(super) fn set_track(&self, track: &TrackInfo) {
+    pub(super) fn set_track(&mut self, track: &TrackInfo) {
         *self.current_track.borrow_mut() = Some((track.artist.clone(), track.title.clone()));
+        self.track_timing = Some(TrackTiming {
+            start_time_ms: track.start_time_ms,
+            duration_ms: u64::from(track.duration_secs).saturating_mul(1_000),
+        });
     }
 
-    pub(super) fn clear_track(&self) {
+    pub(super) fn clear_track(&mut self) {
         *self.current_track.borrow_mut() = None;
+        self.track_timing = None;
+    }
+
+    pub(super) fn progress_fraction(&self, cursor_ms: u64) -> Option<f64> {
+        self.track_timing?.fraction_at(cursor_ms)
     }
 
     pub(super) fn set_latest_cover_url(&mut self, url: Option<&str>) {
@@ -123,6 +151,33 @@ impl RuntimeState {
 
     pub(super) fn is_latest_cover(&self, url: &str) -> bool {
         self.latest_cover_url.as_deref() == Some(url)
+    }
+}
+
+#[cfg(test)]
+mod progress_tests {
+    use super::TrackTiming;
+
+    #[test]
+    fn track_progress_uses_the_playback_cursor_and_clamps_at_both_ends() {
+        let timing = TrackTiming {
+            start_time_ms: 10_000,
+            duration_ms: 20_000,
+        };
+
+        assert_eq!(timing.fraction_at(9_000), Some(0.0));
+        assert_eq!(timing.fraction_at(15_000), Some(0.25));
+        assert_eq!(timing.fraction_at(35_000), Some(1.0));
+    }
+
+    #[test]
+    fn track_progress_is_hidden_when_duration_is_unknown() {
+        let timing = TrackTiming {
+            start_time_ms: 10_000,
+            duration_ms: 0,
+        };
+
+        assert_eq!(timing.fraction_at(15_000), None);
     }
 }
 

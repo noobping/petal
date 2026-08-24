@@ -2,6 +2,7 @@ mod actions;
 mod controls;
 mod cover;
 mod discord;
+mod progress;
 mod viz;
 #[cfg(target_os = "linux")]
 mod volume;

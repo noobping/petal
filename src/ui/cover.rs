@@ -122,6 +122,12 @@ pub fn apply_color(provider: &gtk::CssProvider, tint: (u8, u8, u8), tint_is_ligh
         .header-viz:backdrop {{
             color: rgb({vr} {vg} {vb});
         }}
+        .track-progress {{
+            color: rgb({vr} {vg} {vb});
+        }}
+        .track-progress:backdrop {{
+            color: rgb({vr} {vg} {vb});
+        }}
 
         headerbar.viz-transparent {{
             background: transparent;
@@ -163,6 +169,8 @@ pub fn apply_cover_tint_css_clear(provider: &gtk::CssProvider) {
         .titlebar-tint { background: transparent; }
         .header-viz { color: @accent_color; }
         .header-viz:backdrop { color: @accent_color; }
+        .track-progress { color: @accent_color; }
+        .track-progress:backdrop { color: @accent_color; }
         headerbar.viz-transparent { background: transparent; box-shadow: none; }
         headerbar.viz-transparent:backdrop { background: transparent; box-shadow: none; }
         "#,

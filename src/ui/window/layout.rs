@@ -16,7 +16,7 @@ use std::{
 
 #[cfg(target_os = "linux")]
 use super::super::volume;
-use super::super::{cover, viz};
+use super::super::{cover, progress, viz};
 use super::state::{SharedFlag, SharedTitle};
 use super::APP_NAME;
 
@@ -49,6 +49,7 @@ pub(super) struct WindowLayout {
     pub(super) css_provider: gtk::CssProvider,
     pub(super) viz: gtk::DrawingArea,
     pub(super) viz_handle: viz::VizHandle,
+    pub(super) track_progress: progress::TrackProgress,
 }
 
 pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool) -> WindowLayout {
@@ -174,9 +175,12 @@ pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool)
     let (viz, viz_handle) = viz::make_bars_visualizer(N_VIZ_BARS, HEADER_HEIGHT);
     overlay.set_child(Some(&viz));
 
+    let (track_progress_area, track_progress) = progress::make_track_progress();
+
     header.add_css_class("viz-transparent");
     header.add_css_class("cover-tint");
     overlay.add_overlay(&header);
+    overlay.add_overlay(&track_progress_area);
     window.set_titlebar(Some(&overlay));
 
     let dummy = gtk::Box::new(Orientation::Vertical, 0);
@@ -208,6 +212,7 @@ pub(super) fn build_window_layout(app: &Application, pause_resume_enabled: bool)
         css_provider,
         viz,
         viz_handle,
+        track_progress,
     }
 }
 
