@@ -297,3 +297,9 @@ msgstr ""
 
 msgid "Lyrics by LRCLIB"
 msgstr ""
+
+msgid "Added lyrics."
+msgstr ""
+
+msgid "Added a song progress bar."
+msgstr ""

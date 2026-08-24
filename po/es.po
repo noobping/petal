@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: io.github.noobping.listenmoe 1.2.2\n"
+"Project-Id-Version: io.github.noobping.listenmoe 1.2.3\n"
 "Language: es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -296,3 +296,9 @@ msgstr "Inténtalo de nuevo en un momento."
 
 msgid "Lyrics by LRCLIB"
 msgstr "Letra de LRCLIB"
+
+msgid "Added lyrics."
+msgstr "Se añadieron letras."
+
+msgid "Added a song progress bar."
+msgstr "Se añadió una barra de progreso de la canción."

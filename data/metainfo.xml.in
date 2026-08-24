@@ -79,6 +79,14 @@
   </provides>
 
   <releases>
+    <release version="1.2.3" date="2026-08-24">
+      <description>
+        <ul>
+          <li>Added lyrics.</li>
+          <li>Added a song progress bar.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.2.2" date="2026-08-14">
       <description>
         <p>Volume control added.</p>
