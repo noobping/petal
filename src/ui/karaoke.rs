@@ -197,8 +197,10 @@ fn context_label() -> gtk::Label {
     label.set_ellipsize(pango::EllipsizeMode::End);
     label.set_halign(Align::Fill);
     label.set_justify(Justification::Center);
-    label.set_lines(1);
+    label.set_lines(2);
     label.set_max_width_chars(30);
+    label.set_wrap(true);
+    label.set_wrap_mode(pango::WrapMode::WordChar);
     label.set_xalign(0.5);
     label
 }
